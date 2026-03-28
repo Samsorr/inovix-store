@@ -3,6 +3,8 @@ import Link from "next/link"
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
 
+export const dynamic = "force-dynamic"
+
 export const metadata = {
   title: "Products | Inovix Research Peptides",
 }

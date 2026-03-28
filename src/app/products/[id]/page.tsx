@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
 
+export const dynamic = "force-dynamic"
+
 type Props = {
   params: Promise<{ id: string }>
 }
