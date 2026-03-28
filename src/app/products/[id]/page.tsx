@@ -1,6 +1,7 @@
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import medusa from "@/lib/medusa"
+import { getDefaultRegionId } from "@/lib/region"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -9,7 +10,8 @@ type Props = {
 export async function generateMetadata({ params }: Props) {
   const { id } = await params
   try {
-    const { product } = await medusa.store.product.retrieve(id)
+    const regionId = await getDefaultRegionId()
+    const { product } = await medusa.store.product.retrieve(id, { region_id: regionId })
     return { title: `${product.title} | Inovix Research Peptides` }
   } catch {
     return { title: "Product Not Found | Inovix" }
@@ -18,7 +20,9 @@ export async function generateMetadata({ params }: Props) {
 
 async function getProduct(id: string) {
   try {
+    const regionId = await getDefaultRegionId()
     const { product } = await medusa.store.product.retrieve(id, {
+      region_id: regionId,
       fields: "id,title,description,thumbnail,images,variants.calculated_price,variants.title,variants.sku",
     })
     return product

@@ -1,13 +1,16 @@
 import Image from "next/image"
 import Link from "next/link"
 import medusa from "@/lib/medusa"
+import { getDefaultRegionId } from "@/lib/region"
 
 export const metadata = {
   title: "Products | Inovix Research Peptides",
 }
 
 async function getProducts() {
+  const regionId = await getDefaultRegionId()
   const { products } = await medusa.store.product.list({
+    region_id: regionId,
     fields: "id,title,thumbnail,variants.calculated_price",
   })
   return products
