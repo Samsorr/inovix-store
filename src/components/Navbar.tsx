@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { ShoppingCart, Menu, X, User, Search } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
@@ -21,7 +21,9 @@ export interface NavbarProps {
 export function Navbar({ transparent = false }: NavbarProps) {
   const [cartCount] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const lastScrollY = useRef(0)
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -35,14 +37,21 @@ export function Navbar({ transparent = false }: NavbarProps) {
     }
   }, [menuOpen])
 
-  // Track scroll position for transparent navbar
+  // Hide on scroll down, show on scroll up
   useEffect(() => {
-    if (!transparent) return
-    const handleScroll = () => setScrolled(window.scrollY > 32)
-    handleScroll()
+    const handleScroll = () => {
+      const y = window.scrollY
+      setScrolled(y > 32)
+      if (y > lastScrollY.current && y > 80) {
+        setHidden(true)
+      } else {
+        setHidden(false)
+      }
+      lastScrollY.current = y
+    }
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [transparent])
+  }, [])
 
   const showSolid = !transparent || scrolled
 
@@ -50,7 +59,8 @@ export function Navbar({ transparent = false }: NavbarProps) {
     <>
       <nav
         className={cn(
-          "sticky top-0 z-50 transition-colors duration-300",
+          "sticky top-0 z-50 transition-all duration-300",
+          hidden && !menuOpen ? "-translate-y-full" : "translate-y-0",
           showSolid ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
         )}
       >
