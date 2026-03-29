@@ -152,6 +152,28 @@
   --sidebar-ring: #37788C;
 }
 
+/* ─── Inovix Mobile Layout System ───
+   Mobile-first spacing & section rhythm.
+   All sections use section-y for consistent vertical padding.
+   Content order on mobile follows: visual context → text → action.
+*/
+.section-y {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+@media (min-width: 640px) {
+  .section-y {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+@media (min-width: 768px) {
+  .section-y {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
 /* Inovix gradient utilities */
 .gradient-brand {
   background: linear-gradient(135deg, #162043 0%, #37788C 50%, #AC6E9B 100%);

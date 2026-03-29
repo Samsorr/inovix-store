@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { ShoppingCart, Menu, X, User, Search } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
-
 import { cn } from "@/lib/utils"
 
 const navLinks = [
@@ -53,7 +52,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const showSolid = !transparent || scrolled
+  const showSolid = !menuOpen && (!transparent || scrolled)
 
   return (
     <>

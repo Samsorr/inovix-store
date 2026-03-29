@@ -1,15 +1,5 @@
-"use client"
-
-import { useEffect } from "react"
-
 export function HideDefaultNavbar() {
-  useEffect(() => {
-    const el = document.getElementById("default-navbar")
-    if (el) el.style.display = "none"
-    return () => {
-      if (el) el.style.display = ""
-    }
-  }, [])
-
-  return null
+  return (
+    <style>{`#default-navbar, #default-banner { display: none !important; }`}</style>
+  )
 }

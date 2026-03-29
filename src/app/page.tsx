@@ -50,12 +50,19 @@ export default function HomePage() {
           NAVBAR + HERO — samen in de gradient
       ══════════════════════════════════════════ */}
       <HideDefaultNavbar />
-      <Navbar transparent />
-      <section className="gradient-brand-subtle -mt-14 overflow-hidden pt-14">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 md:py-24 lg:px-8">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            {/* Text column */}
-            <div>
+      <section className="gradient-brand-subtle overflow-hidden">
+        <div className="border-b border-white/10 px-4 py-2">
+          <p className="flex items-center justify-center gap-1.5 text-center text-xs font-medium text-white/60">
+            <FlaskConical className="size-3 shrink-0" />
+            Alle producten zijn uitsluitend bestemd voor wetenschappelijk
+            laboratoriumonderzoek. Niet voor menselijk gebruik.
+          </p>
+        </div>
+        <Navbar transparent />
+        <div className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24 lg:px-8">
+          <div className="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
+            {/* Text + CTAs column — on mobile: headline, description, image, then CTAs */}
+            <div className="flex flex-col">
               <span className="text-xs font-medium uppercase tracking-widest text-teal-200">
                 Premium Research Grade
               </span>
@@ -67,12 +74,37 @@ export default function HomePage() {
                 <br />
                 Onderzoek
               </h1>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-white/60">
+              <p className="mt-4 max-w-md text-base leading-relaxed text-white/60">
                 Hoogwaardige verbindingen met een zuiverheid van meer dan 99%,
                 gevalideerd door onafhankelijke laboratoria voor
                 precisie-onderzoek.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
+              {/* Image — on mobile sits between description and CTAs; on lg moves to its own column */}
+              <div className="relative mt-6 mb-2 lg:hidden">
+                <div className="relative h-[200px] overflow-hidden rounded-lg border border-white/10 sm:h-[260px]">
+                  <Image
+                    src="/images/hero.webp"
+                    alt="Peptide complex onderzoek"
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-navy-500/20" />
+                </div>
+                <div className="absolute -bottom-3 left-4 rounded-md border border-white/15 bg-navy-600/80 px-3 py-2 backdrop-blur-md sm:left-6">
+                  <p className="text-[10px] uppercase tracking-wider text-white/50">
+                    Gevalideerde zuiverheid
+                  </p>
+                  <p className="text-lg font-bold text-teal-300">99.8%</p>
+                  <p className="text-[10px] text-white/40">
+                    Geverifieerd via HPLC analyse
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:mt-8">
                 <Link href="/products" className="w-full sm:w-auto">
                   <Button variant="primaryOnDark" size="lg" fullWidth className="sm:w-auto">
                     Bekijk Catalogus
@@ -87,25 +119,24 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Image column */}
-            <div className="relative">
-              <div className="relative h-[200px] overflow-hidden rounded-lg border border-white/10 sm:h-[280px] lg:h-[360px]">
+            {/* Image column — desktop only (lg:), hidden on mobile since it's inline above */}
+            <div className="relative hidden lg:block">
+              <div className="relative h-[360px] overflow-hidden rounded-lg border border-white/10">
                 <Image
-                  src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80"
-                  alt="Laboratorium onderzoek"
+                  src="/images/hero.webp"
+                  alt="Peptide complex onderzoek"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes="50vw"
                   priority
                 />
                 <div className="absolute inset-0 bg-navy-500/20" />
               </div>
-              {/* Floating purity badge */}
-              <div className="absolute -bottom-4 left-4 rounded-md border border-white/15 bg-navy-600/80 px-3 py-2 backdrop-blur-md sm:left-8 sm:px-4 sm:py-3">
+              <div className="absolute -bottom-4 left-8 rounded-md border border-white/15 bg-navy-600/80 px-4 py-3 backdrop-blur-md">
                 <p className="text-[10px] uppercase tracking-wider text-white/50">
                   Gevalideerde zuiverheid
                 </p>
-                <p className="text-lg font-bold text-teal-300 sm:text-xl">99.8%</p>
+                <p className="text-xl font-bold text-teal-300">99.8%</p>
                 <p className="text-[10px] text-white/40">
                   Geverifieerd via HPLC analyse
                 </p>
@@ -154,7 +185,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════
           FEATURED PRODUCTS
       ══════════════════════════════════════════ */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 md:py-24 lg:px-8">
+      <section className="section-y mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           title="Populaire Onderzoeksproducten"
           subtitle="Onze meest gevraagde verbindingen voor gespecialiseerde laboratoriumtoepassingen"
@@ -168,7 +199,7 @@ export default function HomePage() {
             dosage="5mg Lyophilized"
             purity={99.4}
             status="in-stock"
-            image="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=80"
+            image="/images/product-peptide.png"
             href="/products/bpc-157"
           />
           <ProductCard
@@ -179,7 +210,7 @@ export default function HomePage() {
             purity={98.7}
             status="in-stock"
             bestSeller
-            image="https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&q=80"
+            image="/images/product-peptide.png"
             href="/products/tb-500"
           />
           <ProductCard
@@ -189,7 +220,7 @@ export default function HomePage() {
             dosage="50mg Powder"
             purity={99.1}
             status="in-stock"
-            image="https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&q=80"
+            image="/images/product-peptide.png"
             href="/products/ghk-cu"
           />
         </div>
@@ -198,7 +229,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════
           ONDERZOEK & KENNISBANK — horizontal article cards
       ══════════════════════════════════════════ */}
-      <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 md:pb-24 lg:px-8">
+      <section className="section-y mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           title="Onderzoek & Kennisbank"
           subtitle="Wetenschappelijke inzichten en klinische updates over de toepassingen van peptide verbindingen in de moderne biologie."
@@ -293,11 +324,13 @@ export default function HomePage() {
             wetenschappelijke doorbraken direct in uw inbox.
           </p>
           <div className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:mt-8 sm:flex-row">
-            <Input
-              type="email"
-              placeholder="Uw zakelijke e-mailadres"
-              className="h-12 flex-1 border-white/25 bg-white/15 text-white backdrop-blur-sm placeholder:text-white/50 focus:border-teal-300/60 focus:ring-teal-300/20"
-            />
+            <div className="flex-1">
+              <Input
+                type="email"
+                placeholder="Uw zakelijke e-mailadres"
+                className="h-12 border-white/25 bg-white/15 text-white backdrop-blur-sm placeholder:text-white/50 focus:border-teal-300/60 focus:ring-teal-300/20"
+              />
+            </div>
             <Button variant="primaryOnDark" size="lg" className="w-full sm:w-auto">
               Aanmelden
             </Button>

@@ -67,14 +67,14 @@ function ProductCardInner({
       </div>
 
       {/* Product image */}
-      <div className="mx-4 mt-3 flex h-[140px] items-center justify-center overflow-hidden rounded-md bg-surface-secondary sm:mx-5 sm:h-[160px]">
+      <div className="mx-4 mt-3 flex h-[200px] items-center justify-center overflow-hidden rounded-md bg-surface-secondary sm:mx-5 sm:h-[220px]">
         {image ? (
           <Image
             src={image}
             alt={name}
-            width={160}
-            height={160}
-            className="h-full w-full object-contain p-3"
+            width={240}
+            height={240}
+            className="h-full w-full object-contain p-4"
           />
         ) : (
           <FlaskConical className="size-12 text-muted-foreground/30" />
@@ -110,19 +110,21 @@ function ProductCardInner({
         </div>
       </div>
 
-      {/* Footer: price + cart icon */}
-      <div className="mt-auto flex items-center justify-between px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
+      {/* Footer: price + add to cart */}
+      <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
         <span className="text-xl font-bold tracking-tight text-navy-500">
           {currency}{formattedPrice}
         </span>
         <Button
           variant="primary"
-          size="icon-sm"
+          size="md"
+          fullWidth
           disabled={status === "out-of-stock"}
           onClick={onAddToCart}
           aria-label={`${name} toevoegen aan winkelwagen`}
         >
           <ShoppingCart className="size-4" />
+          {status === "out-of-stock" ? "Niet beschikbaar" : "Toevoegen"}
         </Button>
       </div>
     </div>
