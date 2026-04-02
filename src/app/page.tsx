@@ -69,8 +69,8 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════
           NAVBAR + HERO — samen in de gradient
       ══════════════════════════════════════════ */}
-      <section className="gradient-brand-subtle overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24 lg:px-8">
+      <section className="-mt-24 gradient-brand-subtle overflow-hidden">
+        <div className="mx-auto max-w-7xl px-4 pb-16 pt-36 sm:px-6 sm:pb-20 sm:pt-40 md:pb-24 md:pt-44 lg:px-8">
           <div className="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
             {/* Text + CTAs column — on mobile: headline, description, image, then CTAs */}
             <div className="flex flex-col">
