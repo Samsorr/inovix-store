@@ -52,7 +52,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
         else if (y < 10) setScrolled(false)
 
         // Hide/show with a small dead zone so tiny scrolls don't trigger
-        if (delta > 5 && y > 100) {
+        if (delta > 5 && y > 20) {
           setHidden(true)
         } else if (delta < -5) {
           setHidden(false)
