@@ -54,13 +54,15 @@ export function Navbar({ transparent = false }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  const pastHero = scrolled && transparent
   const showSolid = !menuOpen && (!transparent || scrolled)
 
   return (
     <>
       <nav
         className={cn(
-          "sticky top-0 z-50 transition-all duration-300",
+          "z-50 transition-[transform] duration-300",
+          pastHero ? "fixed top-0 left-0 right-0" : "sticky top-0",
           hidden && !menuOpen ? "-translate-y-full" : "translate-y-0",
           showSolid ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
         )}
