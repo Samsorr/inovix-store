@@ -25,6 +25,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const lastScrollY = useRef(0)
+  const rafId = useRef(0)
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -38,20 +39,33 @@ export function Navbar({ transparent = false }: NavbarProps) {
     }
   }, [menuOpen])
 
-  // Hide on scroll down, show on scroll up
+  // Smooth scroll tracking with rAF
   useEffect(() => {
     const handleScroll = () => {
-      const y = window.scrollY
-      setScrolled(y > 32)
-      if (y > lastScrollY.current && y > 80) {
-        setHidden(true)
-      } else {
-        setHidden(false)
-      }
-      lastScrollY.current = y
+      cancelAnimationFrame(rafId.current)
+      rafId.current = requestAnimationFrame(() => {
+        const y = window.scrollY
+        const delta = y - lastScrollY.current
+
+        // Only toggle scrolled with hysteresis to prevent flicker
+        if (y > 60) setScrolled(true)
+        else if (y < 10) setScrolled(false)
+
+        // Hide/show with a small dead zone so tiny scrolls don't trigger
+        if (delta > 5 && y > 100) {
+          setHidden(true)
+        } else if (delta < -5) {
+          setHidden(false)
+        }
+
+        lastScrollY.current = y
+      })
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      cancelAnimationFrame(rafId.current)
+    }
   }, [])
 
   const pastHero = scrolled && transparent
@@ -61,10 +75,12 @@ export function Navbar({ transparent = false }: NavbarProps) {
     <>
       <nav
         className={cn(
-          "z-50 transition-[transform] duration-300",
+          "z-50 transition-[transform,background-color,box-shadow] duration-500 ease-in-out",
           pastHero ? "fixed top-0 left-0 right-0" : "sticky top-0",
           hidden && !menuOpen ? "-translate-y-full" : "translate-y-0",
-          showSolid ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+          showSolid
+            ? "bg-white/95 shadow-[0_1px_3px_rgba(0,0,0,0.08)] backdrop-blur-md"
+            : "bg-transparent shadow-none"
         )}
       >
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 pt-2 sm:px-6 lg:px-8">
@@ -72,7 +88,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
           <Link
             href="/"
             className={cn(
-              "relative z-50 text-base font-bold tracking-wide transition-colors duration-300",
+              "relative z-50 text-base font-bold tracking-wide transition-colors duration-500 ease-in-out",
               menuOpen ? "text-white" : showSolid ? "text-navy-500" : "text-white"
             )}
           >
@@ -86,7 +102,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "flex h-full items-center border-b-2 text-sm font-medium transition-colors duration-300",
+                  "flex h-full items-center border-b-2 text-sm font-medium transition-colors duration-500 ease-in-out",
                   showSolid
                     ? pathname.startsWith(link.href)
                       ? "border-navy-500 text-navy-500"
@@ -106,7 +122,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
             <Link
               href="/cart"
               className={cn(
-                "relative z-50 inline-flex rounded-md p-2 transition-colors duration-300",
+                "relative z-50 inline-flex rounded-md p-2 transition-colors duration-500 ease-in-out",
                 menuOpen
                   ? "text-white/60 hover:text-white"
                   : showSolid
@@ -126,7 +142,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
             <Link
               href="/account"
               className={cn(
-                "hidden rounded-md p-2 transition-colors duration-300 md:inline-flex",
+                "hidden rounded-md p-2 transition-colors duration-500 ease-in-out md:inline-flex",
                 showSolid
                   ? "text-muted-foreground hover:text-navy-500"
                   : "text-white/60 hover:text-white"
@@ -140,7 +156,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className={cn(
-                "relative z-50 inline-flex rounded-md p-2 transition-colors duration-300 md:hidden",
+                "relative z-50 inline-flex rounded-md p-2 transition-colors duration-500 ease-in-out md:hidden",
                 menuOpen
                   ? "text-white/60 hover:text-white"
                   : showSolid
