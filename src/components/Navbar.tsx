@@ -18,9 +18,8 @@ export interface NavbarProps {
   transparent?: boolean
 }
 
-export function Navbar({ transparent: transparentProp }: NavbarProps) {
+export function Navbar({ transparent = false }: NavbarProps) {
   const pathname = usePathname()
-  const transparent = transparentProp ?? pathname === "/"
   const [cartCount] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [hidden, setHidden] = useState(false)

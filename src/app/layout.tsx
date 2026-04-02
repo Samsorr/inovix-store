@@ -5,7 +5,6 @@ import "./globals.css"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { ResearchBanner } from "@/components/ResearchBanner"
-import { HeaderWrapper } from "@/components/HeaderWrapper"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,10 +26,12 @@ export default function RootLayout({
   return (
     <html lang="nl" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <HeaderWrapper>
+        <div id="default-banner">
           <ResearchBanner />
+        </div>
+        <div id="default-navbar">
           <Navbar />
-        </HeaderWrapper>
+        </div>
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
