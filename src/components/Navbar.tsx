@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { ShoppingCart, Menu, X, User, Search } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { cn } from "@/lib/utils"
 
 const navLinks = [
-  { label: "Onderzoek", href: "/onderzoek", active: true },
-  { label: "Peptiden", href: "/products", active: false },
-  { label: "Laboratoriumbenodigdheden", href: "/lab-supplies", active: false },
-  { label: "Publicaties", href: "/publicaties", active: false },
+  { label: "Peptiden", href: "/products" },
+  { label: "Over Ons", href: "/over-ons" },
+  { label: "Kwaliteit", href: "/kwaliteit" },
+  { label: "Contact", href: "/contact" },
 ]
 
 export interface NavbarProps {
@@ -18,6 +19,7 @@ export interface NavbarProps {
 }
 
 export function Navbar({ transparent = false }: NavbarProps) {
+  const pathname = usePathname()
   const [cartCount] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -84,10 +86,10 @@ export function Navbar({ transparent = false }: NavbarProps) {
                 className={cn(
                   "flex h-full items-center border-b-2 text-sm font-medium transition-colors duration-300",
                   showSolid
-                    ? link.active
+                    ? pathname.startsWith(link.href)
                       ? "border-navy-500 text-navy-500"
                       : "border-transparent text-muted-foreground hover:text-navy-500"
-                    : link.active
+                    : pathname.startsWith(link.href)
                       ? "border-white text-white"
                       : "border-transparent text-white/60 hover:text-white"
                 )}
@@ -203,7 +205,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
                     onClick={() => setMenuOpen(false)}
                     className={cn(
                       "block border-b border-white/10 py-5 text-2xl font-medium transition-colors",
-                      link.active
+                      pathname.startsWith(link.href)
                         ? "text-white"
                         : "text-white/50 hover:text-white"
                     )}
