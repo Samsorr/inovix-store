@@ -16,6 +16,9 @@ import { SectionHeader } from "@/components/SectionHeader"
 import { ProductCard } from "@/components/ProductCard"
 import { Navbar } from "@/components/Navbar"
 import { HideDefaultNavbar } from "@/components/HideDefaultNavbar"
+import medusa from "@/lib/medusa"
+import { getDefaultRegionId } from "@/lib/region"
+import { centsToEuros } from "@/lib/price"
 
 /* ─── Trust badge inline (matching Stitch: icon + title + description, separated by lines) ─── */
 
@@ -41,9 +44,28 @@ function TrustItem({
   )
 }
 
+/* ─── Data ─── */
+
+export const revalidate = 60
+
+async function getFeaturedProducts() {
+  try {
+    const regionId = await getDefaultRegionId()
+    const { products } = await medusa.store.product.list({
+      region_id: regionId,
+      fields: "id,title,handle,subtitle,description,thumbnail,metadata,variants.calculated_price,variants.manage_inventory,variants.inventory_quantity",
+      limit: 3,
+    })
+    return products
+  } catch {
+    return []
+  }
+}
+
 /* ─── Page ─── */
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featuredProducts = await getFeaturedProducts()
   return (
     <>
       {/* ══════════════════════════════════════════
@@ -192,37 +214,31 @@ export default function HomePage() {
           action={{ label: "Toon alle peptiden", href: "/products" }}
         />
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <ProductCard
-            name="BPC-157"
-            description="Onderzoek naar weefselherstel en angiogenese processen."
-            price={42.5}
-            dosage="5mg Lyophilized"
-            purity={99.4}
-            status="in-stock"
-            image="/images/product-peptide.png"
-            href="/products/bpc-157"
-          />
-          <ProductCard
-            name="TB-500"
-            description="Synthetische versie van Thymosin Beta-4 voor regeneratief onderzoek."
-            price={38}
-            dosage="2mg Lyophilized"
-            purity={98.7}
-            status="in-stock"
-            bestSeller
-            image="/images/product-peptide.png"
-            href="/products/tb-500"
-          />
-          <ProductCard
-            name="GHK-Cu"
-            description="Koper-peptide complex bestudeerd voor dermatologisch onderzoek."
-            price={55}
-            dosage="50mg Powder"
-            purity={99.1}
-            status="in-stock"
-            image="/images/product-peptide.png"
-            href="/products/ghk-cu"
-          />
+          {featuredProducts.map((product) => {
+            const variant = product.variants?.[0]
+            const price = variant?.calculated_price?.calculated_amount
+            const metadata = product.metadata as Record<string, unknown> | null
+            const inventoryQty = (variant as unknown as { inventory_quantity?: number })?.inventory_quantity
+            const status = inventoryQty != null && inventoryQty <= 0
+              ? "out-of-stock"
+              : inventoryQty != null && inventoryQty <= 10
+                ? "low-stock"
+                : "in-stock"
+
+            return (
+              <ProductCard
+                key={product.id}
+                name={product.title ?? ""}
+                description={product.description ?? ""}
+                price={price != null ? centsToEuros(price) : 0}
+                dosage={product.subtitle ?? ""}
+                purity={Number(metadata?.purity) || 0}
+                status={status}
+                image={product.thumbnail || "/images/product-peptide.png"}
+                href={`/products/${product.id}`}
+              />
+            )
+          })}
         </div>
       </section>
 

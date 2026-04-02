@@ -2,8 +2,9 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
+import { formatPrice } from "@/lib/price"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 type Props = {
   params: Promise<{ id: string }>
@@ -120,7 +121,7 @@ export default async function ProductDetailPage({ params }: Props) {
                         )}
                       </div>
                       <span className="font-semibold">
-                        {price != null ? `${(price / 100).toFixed(2)} EUR` : "—"}
+                        {price != null ? formatPrice(price) : "—"}
                       </span>
                     </div>
                   )
