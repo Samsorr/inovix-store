@@ -14,8 +14,6 @@ import { Badge } from "@/components/ui/badge"
 import { GradientSection } from "@/components/GradientSection"
 import { SectionHeader } from "@/components/SectionHeader"
 import { ProductCard } from "@/components/ProductCard"
-import { Navbar } from "@/components/Navbar"
-import { HideDefaultNavbar } from "@/components/HideDefaultNavbar"
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
 import { centsToEuros } from "@/lib/price"
@@ -71,16 +69,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════
           NAVBAR + HERO — samen in de gradient
       ══════════════════════════════════════════ */}
-      <HideDefaultNavbar />
       <section className="gradient-brand-subtle overflow-hidden">
-        <div className="border-b border-white/10 px-4 py-2">
-          <p className="flex items-center justify-center gap-1.5 text-center text-xs font-medium text-white/60">
-            <FlaskConical className="size-3 shrink-0" />
-            Alle producten zijn uitsluitend bestemd voor wetenschappelijk
-            laboratoriumonderzoek. Niet voor menselijk gebruik.
-          </p>
-        </div>
-        <Navbar transparent />
         <div className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24 lg:px-8">
           <div className="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
             {/* Text + CTAs column — on mobile: headline, description, image, then CTAs */}
