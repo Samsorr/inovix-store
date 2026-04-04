@@ -235,6 +235,8 @@ export default async function HomePage() {
                 purity={Number(metadata?.purity) || 0}
                 status={status}
                 image={product.thumbnail || "/images/product-peptide.png"}
+                productId={product.id}
+                variants={(product.variants ?? []).map((v) => ({ id: v.id }))}
                 href={`/products/${product.id}`}
               />
             )

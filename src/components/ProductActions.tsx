@@ -13,7 +13,7 @@ type Variant = {
   title?: string | null
   sku?: string | null
   calculated_price?: {
-    calculated_amount?: number
+    calculated_amount?: number | null
   }
 }
 

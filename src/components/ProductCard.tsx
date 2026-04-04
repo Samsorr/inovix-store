@@ -1,8 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { FlaskConical, ShoppingCart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useCart } from "@/lib/context/cart-context"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
@@ -22,7 +26,8 @@ export interface ProductCardProps {
   status: "in-stock" | "out-of-stock" | "low-stock"
   bestSeller?: boolean
   image?: string
-  onAddToCart?: () => void
+  productId: string
+  variants?: Array<{ id: string }>
   href?: string
   className?: string
 }
@@ -37,9 +42,27 @@ function ProductCardInner({
   status,
   bestSeller,
   image,
-  onAddToCart,
+  productId,
+  variants = [],
   className,
 }: Omit<ProductCardProps, "href">) {
+  const router = useRouter()
+  const { addItem, isUpdating } = useCart()
+  const hasMultipleVariants = variants.length > 1
+  const firstVariantId = variants[0]?.id
+
+  async function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (hasMultipleVariants) {
+      router.push(`/products/${productId}`)
+      return
+    }
+    if (firstVariantId) {
+      await addItem(firstVariantId, 1)
+    }
+  }
+
   const statusInfo = statusConfig[status]
   const formattedPrice = new Intl.NumberFormat("nl-NL", {
     minimumFractionDigits: 2,
@@ -119,12 +142,18 @@ function ProductCardInner({
           variant="primary"
           size="md"
           fullWidth
-          disabled={status === "out-of-stock"}
-          onClick={onAddToCart}
+          disabled={status === "out-of-stock" || isUpdating}
+          onClick={handleAddToCart}
           aria-label={`${name} toevoegen aan winkelwagen`}
         >
           <ShoppingCart className="size-4" />
-          {status === "out-of-stock" ? "Niet beschikbaar" : "Toevoegen"}
+          {status === "out-of-stock"
+            ? "Niet beschikbaar"
+            : isUpdating
+              ? "Toevoegen..."
+              : hasMultipleVariants
+                ? "Kies variant"
+                : "Toevoegen"}
         </Button>
       </div>
     </div>

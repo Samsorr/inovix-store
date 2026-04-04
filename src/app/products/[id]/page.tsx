@@ -2,7 +2,7 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
-import { formatPrice } from "@/lib/price"
+import { ProductActions } from "@/components/ProductActions"
 
 export const revalidate = 60
 
@@ -100,47 +100,14 @@ export default async function ProductDetailPage({ params }: Props) {
             <p className="text-gray-600 text-sm leading-relaxed">{product.description}</p>
           )}
 
-          {/* Variants */}
+          {/* Variant selection + Add to Cart */}
           {product.variants && product.variants.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="font-semibold text-sm uppercase tracking-wide text-gray-500">
-                Variants
-              </h2>
-              <div className="space-y-2">
-                {product.variants.map((variant) => {
-                  const price = variant.calculated_price?.calculated_amount
-                  return (
-                    <div
-                      key={variant.id}
-                      className="flex justify-between items-center border rounded p-3 text-sm"
-                    >
-                      <div>
-                        <span className="font-medium">{variant.title}</span>
-                        {variant.sku && (
-                          <span className="ml-2 text-gray-400 text-xs">SKU: {variant.sku}</span>
-                        )}
-                      </div>
-                      <span className="font-semibold">
-                        {price != null ? formatPrice(price) : "—"}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+            <ProductActions variants={product.variants} />
           )}
 
-          {/* Add to Cart — placeholder */}
-          <button
-            className="w-full bg-gray-900 text-white py-3 px-6 rounded font-medium hover:bg-gray-700 transition-colors cursor-not-allowed opacity-60"
-            disabled
-          >
-            Add to Cart (coming soon)
-          </button>
-
-          <p className="text-xs text-gray-400">
-            By purchasing this product, you confirm you are a qualified researcher and agree to use
-            it solely for legitimate research purposes.
+          <p className="text-xs text-muted-foreground">
+            Door dit product te bestellen bevestigt u dat u een gekwalificeerde onderzoeker
+            bent en het uitsluitend voor laboratoriumonderzoek zult gebruiken.
           </p>
         </div>
       </div>
