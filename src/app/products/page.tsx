@@ -1,5 +1,6 @@
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
+import { centsToEuros } from "@/lib/price"
 import { ResearchDisclaimer } from "@/components/ResearchDisclaimer"
 import { ProductCard } from "@/components/ProductCard"
 
@@ -14,7 +15,7 @@ async function getProducts() {
     const regionId = await getDefaultRegionId()
     const { products } = await medusa.store.product.list({
       region_id: regionId,
-      fields: "id,title,description,thumbnail,variants.id,variants.calculated_price",
+      fields: "id,title,description,subtitle,thumbnail,metadata,variants.id,variants.calculated_price,variants.inventory_quantity",
     })
     return products
   } catch {
@@ -37,8 +38,15 @@ export default async function ProductsPage() {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.map((product) => {
-          const price =
-            product.variants?.[0]?.calculated_price?.calculated_amount ?? 0
+          const variant = product.variants?.[0]
+          const price = variant?.calculated_price?.calculated_amount
+          const metadata = product.metadata as Record<string, unknown> | null
+          const inventoryQty = (variant as unknown as { inventory_quantity?: number })?.inventory_quantity
+          const status = inventoryQty != null && inventoryQty <= 0
+            ? "out-of-stock"
+            : inventoryQty != null && inventoryQty <= 10
+              ? "low-stock"
+              : "in-stock"
           const variants = (product.variants ?? []).map((v) => ({ id: v.id }))
 
           return (
@@ -46,10 +54,10 @@ export default async function ProductsPage() {
               key={product.id}
               name={product.title ?? "Onbekend product"}
               description={product.description ?? ""}
-              price={price / 100}
-              dosage=""
-              purity={0}
-              status="in-stock"
+              price={price != null ? centsToEuros(price) : 0}
+              dosage={product.subtitle ?? ""}
+              purity={Number(metadata?.purity) || 0}
+              status={status}
               image={product.thumbnail ?? undefined}
               productId={product.id}
               variants={variants}

@@ -27,8 +27,6 @@ export function ProductActions({ variants }: ProductActionsProps) {
     variants.length === 1 ? variants[0].id : null
   )
 
-  const selectedVariant = variants.find((v) => v.id === selectedVariantId)
-
   async function handleAddToCart() {
     if (!selectedVariantId) return
     await addItem(selectedVariantId, 1)

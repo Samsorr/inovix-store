@@ -47,15 +47,15 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8">
-      <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-        <strong>Research Use Only.</strong> This product is intended strictly for laboratory
-        research purposes. Not for human consumption. For use by qualified researchers only.
+      <div className="mb-6 rounded-md border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800">
+        <strong>Uitsluitend voor onderzoek.</strong> Dit product is uitsluitend bedoeld voor
+        laboratoriumonderzoek. Niet voor menselijke consumptie. Alleen voor gekwalificeerde onderzoekers.
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Images */}
         <div className="space-y-3">
-          <div className="relative h-80 bg-gray-100 rounded-lg overflow-hidden">
+          <div className="relative h-80 bg-surface-secondary rounded-lg overflow-hidden">
             {displayImage ? (
               <Image
                 src={displayImage}
@@ -66,7 +66,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 priority
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-muted-foreground">
                 No image available
               </div>
             )}
@@ -77,7 +77,7 @@ export default async function ProductDetailPage({ params }: Props) {
               {images.slice(1).map((img) => (
                 <div
                   key={img.id}
-                  className="relative flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden"
+                  className="relative flex-shrink-0 w-20 h-20 bg-surface-secondary rounded overflow-hidden"
                 >
                   <Image
                     src={img.url}
@@ -97,7 +97,7 @@ export default async function ProductDetailPage({ params }: Props) {
           <h1 className="text-2xl font-bold">{product.title}</h1>
 
           {product.description && (
-            <p className="text-gray-600 text-sm leading-relaxed">{product.description}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">{product.description}</p>
           )}
 
           {/* Variant selection + Add to Cart */}

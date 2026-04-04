@@ -16,7 +16,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet"
 
-export default function CartSheet() {
+export function CartSheet() {
   const {
     cart,
     isUpdating,
@@ -175,7 +175,7 @@ export default function CartSheet() {
               </span>
             </div>
 
-            <Button variant="primary" size="lg" fullWidth>
+            <Button variant="primary" size="lg" fullWidth disabled>
               Naar checkout
             </Button>
 

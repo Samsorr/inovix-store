@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react"
 import { CartProvider } from "@/lib/context/cart-context"
-import CartSheet from "@/components/CartSheet"
+import { CartSheet } from "@/components/CartSheet"
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
