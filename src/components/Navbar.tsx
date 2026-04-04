@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { ShoppingCart, Menu, X, User, Search } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { cn } from "@/lib/utils"
+import { useCart } from "@/lib/context/cart-context"
 
 const navLinks = [
   { label: "Peptiden", href: "/products" },
@@ -20,12 +21,12 @@ export interface NavbarProps {
 
 export function Navbar({ transparent = false }: NavbarProps) {
   const pathname = usePathname()
-  const [cartCount] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const lastScrollY = useRef(0)
   const rafId = useRef(0)
+  const { cartCount, openCart } = useCart()
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -119,8 +120,8 @@ export function Navbar({ transparent = false }: NavbarProps) {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
-            <Link
-              href="/cart"
+            <button
+              onClick={openCart}
               className={cn(
                 "relative z-50 inline-flex rounded-md p-2 transition-colors duration-500 ease-in-out",
                 menuOpen
@@ -137,7 +138,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </button>
 
             <Link
               href="/account"
