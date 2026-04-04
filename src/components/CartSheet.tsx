@@ -104,7 +104,7 @@ export function CartSheet() {
                       )}
                     </div>
                     <p className="shrink-0 text-sm font-medium text-navy-500">
-                      {formatPrice(item.total ?? 0)}
+                      {formatPrice((item.unit_price ?? 0) * item.quantity)}
                     </p>
                   </div>
 
