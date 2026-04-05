@@ -59,7 +59,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
               menuOpen ? "text-white" : solid ? "text-navy-500" : "text-white"
             )}
           >
-            Inovix
+            INOVIX
           </Link>
 
           {/* Desktop nav links */}
@@ -110,15 +110,13 @@ export function Navbar({ transparent = false }: NavbarProps) {
               <Link
                 href="/account"
                 className={cn(
-                  "relative hidden p-2 transition-colors md:inline-flex",
+                  "hidden items-center gap-1.5 px-2 py-1 text-sm font-medium transition-colors md:inline-flex",
                   solid
                     ? "text-muted-foreground hover:text-navy-500"
                     : "text-white/60 hover:text-white"
                 )}
-                aria-label="Mijn account"
               >
                 <User className="size-[18px]" />
-                <span className="absolute right-1 top-1 size-2 rounded-full bg-teal-400" />
               </Link>
             ) : (
               <Link

@@ -377,7 +377,7 @@ export default function AccountPage() {
                             <span className="text-muted-foreground">
                               {item.quantity}&times; {item.title}
                               {item.variant?.title
-                                ? ` — ${item.variant.title}`
+                                ? ` · ${item.variant.title}`
                                 : ""}
                             </span>
                             <span className="tabular-nums text-navy-500">

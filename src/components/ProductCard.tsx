@@ -23,6 +23,7 @@ export interface ProductCardProps {
   currency?: string
   dosage: string
   purity: number
+  category?: string
   status: "in-stock" | "out-of-stock" | "low-stock"
   bestSeller?: boolean
   image?: string
@@ -45,7 +46,7 @@ function ProductCardInner({
   productId,
   variants = [],
   className,
-}: Omit<ProductCardProps, "href">) {
+}: Omit<ProductCardProps, "href" | "category">) {
   const router = useRouter()
   const { addItem, isUpdating } = useCart()
   const hasMultipleVariants = variants.length > 1
@@ -160,7 +161,7 @@ function ProductCardInner({
   )
 }
 
-export function ProductCard({ href, ...props }: ProductCardProps) {
+export function ProductCard({ href, category: _, ...props }: ProductCardProps) {
   if (href) {
     return (
       <Link href={href} className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400">

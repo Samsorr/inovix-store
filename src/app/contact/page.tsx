@@ -5,7 +5,7 @@ import { Mail, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Contact — Inovix",
+  title: "Contact | Inovix",
   description:
     "Neem contact op met Inovix voor vragen over onze onderzoekspeptiden, bestellingen of samenwerkingen.",
 }

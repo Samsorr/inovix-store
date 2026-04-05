@@ -18,7 +18,7 @@ import { Navbar } from "@/components/Navbar"
 import { HideDefaultNavbar } from "@/components/HideDefaultNavbar"
 
 export const metadata: Metadata = {
-  title: "Over Ons — Inovix",
+  title: "Over Ons | Inovix",
   description:
     "Inovix levert hoogzuivere peptiden voor wetenschappelijk onderzoek aan laboratoria in heel Europa. Ontdek onze missie, kwaliteitsstandaarden en werkwijze.",
 }
@@ -35,7 +35,7 @@ function QualityCard({
   description: string
 }) {
   return (
-    <div className="flex items-start gap-4 border border-border bg-white p-5 sm:p-6">
+    <div className="flex h-full items-start gap-4 border border-border bg-white p-5 sm:p-6">
       <div className="flex size-10 shrink-0 items-center justify-center border border-border">
         <Icon className="size-5 text-teal-400" />
       </div>
@@ -59,13 +59,6 @@ export default function OverOnsPage() {
       ══════════════════════════════════════════ */}
       <HideDefaultNavbar />
       <section className="gradient-brand-subtle">
-        <div className="border-b border-white/10 px-4 py-2">
-          <p className="flex items-center justify-center gap-1.5 text-center text-xs font-medium text-white/60">
-            <FlaskConical className="size-3 shrink-0" />
-            Alle producten zijn uitsluitend bestemd voor wetenschappelijk
-            laboratoriumonderzoek. Niet voor menselijk gebruik.
-          </p>
-        </div>
         <Navbar transparent />
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 md:py-32 lg:px-8 lg:py-36">
           <div className="mx-auto max-w-3xl text-center">
@@ -84,7 +77,7 @@ export default function OverOnsPage() {
             <ScrollReveal delay={0.2}>
               <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg md:mt-8">
                 Inovix voorziet Europese onderzoekslaboratoria van hoogzuivere
-                peptiden — gesynthetiseerd, gezuiverd en geverifieerd volgens de
+                peptiden: gesynthetiseerd, gezuiverd en geverifieerd volgens de
                 strengste kwaliteitsnormen.
               </p>
             </ScrollReveal>
@@ -117,7 +110,7 @@ export default function OverOnsPage() {
                     uitsluitend met GMP-gecertificeerde synthesefaciliteiten,
                     voeren op elke batch onafhankelijke HPLC-analyse uit en
                     leveren de bijbehorende Certificate of Analysis standaard
-                    mee — geen meerprijs, geen extra aanvraag.
+                    mee. Geen meerprijs, geen extra aanvraag.
                   </p>
                   <p>
                     Het resultaat: verbindingen die u met vertrouwen kunt
@@ -165,7 +158,7 @@ export default function OverOnsPage() {
               <ScrollReveal className="lg:col-span-2">
                 <SectionHeader title="Onze kwaliteitsstandaard" />
                 <p className="mt-5 text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-base">
-                  Kwaliteit is geen marketingterm — het is een meetbare
+                  Kwaliteit is geen marketingterm, het is een meetbare
                   standaard. Elke verbinding die ons magazijn verlaat is
                   traceerbaar, onafhankelijk geverifieerd en gedocumenteerd tot
                   op batchniveau.

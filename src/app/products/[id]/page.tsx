@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${product.title} | Inovix Research Peptides`,
       description:
         product.description?.slice(0, 160) ??
-        `${product.title} — onderzoekspeptide beschikbaar bij Inovix.`,
+        `${product.title} | onderzoekspeptide beschikbaar bij Inovix.`,
       openGraph: {
         images: product.thumbnail ? [product.thumbnail] : [],
       },
@@ -93,14 +93,14 @@ export default async function ProductDetailPage({ params }: Props) {
         <Link href="/" className="transition-colors hover:text-navy-500">
           Home
         </Link>
-        <span className="mx-2">—</span>
+        <span className="mx-2">/</span>
         <Link
           href="/products"
           className="transition-colors hover:text-navy-500"
         >
           Peptiden
         </Link>
-        <span className="mx-2">—</span>
+        <span className="mx-2">/</span>
         <span className="font-medium text-mauve-500">{product.title}</span>
       </nav>
 

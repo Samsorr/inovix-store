@@ -4,7 +4,7 @@ import "./globals.css"
 
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
-import { ResearchBanner } from "@/components/ResearchBanner"
+
 import { Providers } from "@/components/Providers"
 
 const sora = Sora({
@@ -14,7 +14,7 @@ const sora = Sora({
 })
 
 export const metadata: Metadata = {
-  title: "Inovix — Research Peptides",
+  title: "Inovix | Research Peptides",
   description:
     "Premium peptiden voor wetenschappelijk laboratoriumonderzoek. Geleverd binnen de EU.",
 }
@@ -28,9 +28,6 @@ export default function RootLayout({
     <html lang="nl" className={`${sora.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Providers>
-          <div id="default-banner">
-            <ResearchBanner />
-          </div>
           <div id="default-navbar">
             <Navbar />
           </div>

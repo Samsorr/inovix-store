@@ -82,13 +82,6 @@ export default async function HomePage() {
       ══════════════════════════════════════════ */}
       <HideDefaultNavbar />
       <section className="gradient-brand-subtle overflow-hidden">
-        <div className="border-b border-white/10 px-4 py-2">
-          <p className="flex items-center justify-center gap-1.5 text-center text-xs font-medium text-white/60">
-            <FlaskConical className="size-3 shrink-0" />
-            Alle producten zijn uitsluitend bestemd voor wetenschappelijk
-            laboratoriumonderzoek. Niet voor menselijk gebruik.
-          </p>
-        </div>
         <Navbar transparent />
         <div className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24 lg:px-8">
           <div className="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
@@ -310,7 +303,7 @@ export default async function HomePage() {
               <ScrollReveal key={category.title} delay={index * 0.08}>
                 <Link
                   href={category.href}
-                  className="group flex flex-col items-center gap-3 border border-border bg-white p-6 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                  className="group flex h-full flex-col items-center gap-3 border border-border bg-white p-6 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <div className="flex size-11 items-center justify-center border border-border">
                     <category.icon className="size-5 text-teal-400" />
@@ -333,7 +326,7 @@ export default async function HomePage() {
         <ScrollReveal>
           <SectionHeader
             title="Analytische Kwaliteitsborging"
-            subtitle="Transparantie in elke stap — van synthese tot levering"
+            subtitle="Transparantie in elke stap, van synthese tot levering"
           />
         </ScrollReveal>
         <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:items-center">
@@ -431,7 +424,7 @@ export default async function HomePage() {
           <ScrollReveal delay={0.1}>
           <Link
             href="/publicaties/bpc-157-inflammatoire-darmziekten"
-            className="group flex flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-start"
+            className="group flex h-full flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-start"
           >
             <div className="relative h-40 w-full shrink-0 overflow-hidden sm:h-auto sm:w-28 sm:self-stretch">
               <Image
@@ -470,7 +463,7 @@ export default async function HomePage() {
           <ScrollReveal delay={0.2}>
           <Link
             href="/publicaties/opslag-gelyofiliseerde-peptiden"
-            className="group flex flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-start"
+            className="group flex h-full flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-start"
           >
             <div className="relative h-40 w-full shrink-0 overflow-hidden sm:h-auto sm:w-28 sm:self-stretch">
               <Image

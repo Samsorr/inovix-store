@@ -5,7 +5,7 @@ import { FlaskConical, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Kwaliteit & Analyse — Inovix",
+  title: "Kwaliteit & Analyse | Inovix",
   description:
     "Ontdek de kwaliteitsstandaarden en analysemethoden van Inovix. HPLC-analyse, LC-MS verificatie en onafhankelijke Europese laboratoriumcontrole.",
 }

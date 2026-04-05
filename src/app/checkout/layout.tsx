@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Checkout — Inovix",
+  title: "Checkout | Inovix",
   description: "Rond uw bestelling veilig af.",
 }
 

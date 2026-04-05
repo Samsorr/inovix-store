@@ -18,9 +18,9 @@ This is the Next.js storefront for Inovix, an EU peptide research e-commerce sto
 
 ## Compliance Requirements
 - **All pages showing products must include a "Research Use Only" disclaimer** — this is a legal requirement for EU peptide sales
-- Age verification (18+) is required before checkout
 - EU cookie consent and privacy policy are mandatory
 - Never market products for human use
+- No age verification gate (removed by design decision)
 
 ## Design Guidelines
 - Modern, clean, medical/scientific aesthetic

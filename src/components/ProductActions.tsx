@@ -66,7 +66,7 @@ export function ProductActions({ variants }: ProductActionsProps) {
                     )}
                   </div>
                   <span className="font-semibold text-navy-500">
-                    {price != null ? formatPrice(price) : "—"}
+                    {price != null ? formatPrice(price) : "-"}
                   </span>
                 </button>
               )

@@ -11,10 +11,9 @@ import medusa from "@/lib/medusa"
 import { formatPrice } from "@/lib/price"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AgeVerification } from "@/components/AgeVerification"
+
 import { cn } from "@/lib/utils"
 
-const AGE_VERIFIED_KEY = "inovix-age-verified"
 
 // ---------------------------------------------------------------------------
 // EU Countries
@@ -304,13 +303,9 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [globalError, setGlobalError] = useState("")
   const [researchConfirmed, setResearchConfirmed] = useState(false)
-  const [ageVerified, setAgeVerified] = useState(true)
-
-  // Close cart sheet on mount & check age verification
+  // Close cart sheet on mount
   useEffect(() => {
     closeCart()
-    const verified = localStorage.getItem(AGE_VERIFIED_KEY)
-    if (!verified) setAgeVerified(false)
   }, [closeCart])
 
   // Pre-fill email from cart
@@ -671,7 +666,7 @@ export default function CheckoutPage() {
     (o) => o.id === selectedShipping
   )
   const shippingSummary = selectedShippingOption
-    ? `${selectedShippingOption.name} — ${
+    ? `${selectedShippingOption.name} · ${
         selectedShippingOption.amount
           ? formatPrice(selectedShippingOption.amount)
           : "Gratis"
@@ -690,10 +685,6 @@ export default function CheckoutPage() {
   // -----------------------------------------------------------------------
   // Loading / empty states
   // -----------------------------------------------------------------------
-
-  if (!ageVerified) {
-    return <AgeVerification />
-  }
 
   if (isLoading) {
     return (
