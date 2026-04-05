@@ -58,7 +58,7 @@ export default async function ProductsPage() {
               dosage={product.subtitle ?? ""}
               purity={Number(metadata?.purity) || 0}
               status={status}
-              image={product.thumbnail ?? undefined}
+              image={product.thumbnail || "/images/product-peptide.png"}
               productId={product.id}
               variants={variants}
               href={`/products/${product.id}`}

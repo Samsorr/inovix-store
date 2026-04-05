@@ -49,10 +49,10 @@ export function ProductActions({ variants }: ProductActionsProps) {
                   key={variant.id}
                   onClick={() => setSelectedVariantId(variant.id)}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-md border p-3 text-sm transition-colors",
+                    "flex w-full items-center justify-between border p-3 text-sm transition-colors",
                     isSelected
-                      ? "border-teal-400 bg-teal-50 ring-1 ring-teal-400"
-                      : "border-border hover:border-teal-200"
+                      ? "border-navy-500 bg-navy-500/[0.02]"
+                      : "border-border hover:border-navy-200"
                   )}
                 >
                   <div>

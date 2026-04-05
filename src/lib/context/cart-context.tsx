@@ -39,6 +39,12 @@ interface CartContextValue {
   openCart: () => void
   closeCart: () => void
 
+  // Checkout helpers
+  /** Directly update the cart state (used by checkout after SDK calls). */
+  updateCartState: (cart: Cart) => void
+  /** Clear the cart after order completion and create a fresh one. */
+  resetCart: () => void
+
   // Computed
   /** Total number of items in the cart. */
   cartCount: number
@@ -214,6 +220,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsCartOpen(true), [])
   const closeCart = useCallback(() => setIsCartOpen(false), [])
 
+  const updateCartState = useCallback((updated: Cart) => {
+    setCart(updated)
+  }, [])
+
+  const resetCart = useCallback(() => {
+    localStorage.removeItem(CART_ID_KEY)
+    setCart(null)
+    // Create a fresh cart asynchronously
+    ;(async () => {
+      try {
+        const regionId = await getDefaultRegionId()
+        const { cart: newCart } = await medusa.store.cart.create({
+          region_id: regionId,
+        })
+        localStorage.setItem(CART_ID_KEY, newCart.id)
+        setCart(newCart)
+      } catch {
+        // Silent — next page load will create a new cart
+      }
+    })()
+  }, [])
+
   // ------- computed -------
 
   const cartCount = useMemo(
@@ -238,6 +266,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateQuantity,
       openCart,
       closeCart,
+      updateCartState,
+      resetCart,
       cartCount,
       cartTotal,
     }),
@@ -252,6 +282,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateQuantity,
       openCart,
       closeCart,
+      updateCartState,
+      resetCart,
       cartCount,
       cartTotal,
     ]

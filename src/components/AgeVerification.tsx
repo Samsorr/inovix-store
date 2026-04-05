@@ -32,10 +32,10 @@ export function AgeVerification() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-900/80 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-2xl sm:p-8">
+      <div className="w-full max-w-md border border-border bg-card p-6 shadow-2xl sm:p-8">
         <div className="flex flex-col items-center text-center">
-          <div className="flex size-12 items-center justify-center rounded-full bg-teal-50">
-            <ShieldCheck className="size-6 text-teal-400" />
+          <div className="flex size-12 items-center justify-center border border-border">
+            <ShieldCheck className="size-6 text-navy-500" />
           </div>
 
           <h2 className="mt-4 text-xl font-bold text-navy-500">

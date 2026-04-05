@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ShoppingCart, Menu, X, User, Search } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/lib/context/cart-context"
+import { useAuth } from "@/lib/context/auth-context"
 
 const navLinks = [
   { label: "Peptiden", href: "/products" },
@@ -22,11 +23,8 @@ export interface NavbarProps {
 export function Navbar({ transparent = false }: NavbarProps) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [hidden, setHidden] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const lastScrollY = useRef(0)
-  const rafId = useRef(0)
   const { cartCount, openCart } = useCart()
+  const { isAuthenticated, customer } = useAuth()
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -40,48 +38,16 @@ export function Navbar({ transparent = false }: NavbarProps) {
     }
   }, [menuOpen])
 
-  // Smooth scroll tracking with rAF
-  useEffect(() => {
-    const handleScroll = () => {
-      cancelAnimationFrame(rafId.current)
-      rafId.current = requestAnimationFrame(() => {
-        const y = window.scrollY
-        const delta = y - lastScrollY.current
-
-        // Only toggle scrolled with hysteresis to prevent flicker
-        if (y > 60) setScrolled(true)
-        else if (y < 10) setScrolled(false)
-
-        // Hide/show with a small dead zone so tiny scrolls don't trigger
-        if (delta > 5 && y > 20) {
-          setHidden(true)
-        } else if (delta < -5) {
-          setHidden(false)
-        }
-
-        lastScrollY.current = y
-      })
-    }
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-      cancelAnimationFrame(rafId.current)
-    }
-  }, [])
-
-  const pastHero = scrolled && transparent
-  const showSolid = !menuOpen && (!transparent || scrolled)
+  const solid = !transparent
 
   return (
     <>
       <nav
         className={cn(
-          "z-50 transition-[transform,background-color,box-shadow] duration-500 ease-in-out",
-          pastHero ? "fixed top-0 left-0 right-0" : "sticky top-0",
-          hidden && !menuOpen ? "-translate-y-full" : "translate-y-0",
-          showSolid
-            ? "bg-white/95 shadow-[0_1px_3px_rgba(0,0,0,0.08)] backdrop-blur-md"
-            : "bg-transparent shadow-none"
+          "z-50",
+          solid
+            ? "bg-white border-b border-border"
+            : "bg-transparent"
         )}
       >
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 pt-2 sm:px-6 lg:px-8">
@@ -89,8 +55,8 @@ export function Navbar({ transparent = false }: NavbarProps) {
           <Link
             href="/"
             className={cn(
-              "relative z-50 text-base font-bold tracking-wide transition-colors duration-500 ease-in-out",
-              menuOpen ? "text-white" : showSolid ? "text-navy-500" : "text-white"
+              "relative z-50 text-base font-bold tracking-wide",
+              menuOpen ? "text-white" : solid ? "text-navy-500" : "text-white"
             )}
           >
             Inovix
@@ -103,8 +69,8 @@ export function Navbar({ transparent = false }: NavbarProps) {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "flex h-full items-center border-b-2 text-sm font-medium transition-colors duration-500 ease-in-out",
-                  showSolid
+                  "flex h-full items-center border-b-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400/40",
+                  solid
                     ? pathname.startsWith(link.href)
                       ? "border-navy-500 text-navy-500"
                       : "border-transparent text-muted-foreground hover:text-navy-500"
@@ -123,10 +89,10 @@ export function Navbar({ transparent = false }: NavbarProps) {
             <button
               onClick={openCart}
               className={cn(
-                "relative z-50 inline-flex rounded-md p-2 transition-colors duration-500 ease-in-out",
+                "relative z-50 inline-flex p-2 transition-colors",
                 menuOpen
                   ? "text-white/60 hover:text-white"
-                  : showSolid
+                  : solid
                     ? "text-muted-foreground hover:text-navy-500"
                     : "text-white/60 hover:text-white"
               )}
@@ -140,27 +106,42 @@ export function Navbar({ transparent = false }: NavbarProps) {
               )}
             </button>
 
-            <Link
-              href="/account"
-              className={cn(
-                "hidden rounded-md p-2 transition-colors duration-500 ease-in-out md:inline-flex",
-                showSolid
-                  ? "text-muted-foreground hover:text-navy-500"
-                  : "text-white/60 hover:text-white"
-              )}
-              aria-label="Account"
-            >
-              <User className="size-[18px]" />
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/account"
+                className={cn(
+                  "relative hidden p-2 transition-colors md:inline-flex",
+                  solid
+                    ? "text-muted-foreground hover:text-navy-500"
+                    : "text-white/60 hover:text-white"
+                )}
+                aria-label="Mijn account"
+              >
+                <User className="size-[18px]" />
+                <span className="absolute right-1 top-1 size-2 rounded-full bg-teal-400" />
+              </Link>
+            ) : (
+              <Link
+                href="/account/login"
+                className={cn(
+                  "hidden items-center gap-1.5 px-2 py-1 text-sm font-medium transition-colors md:inline-flex",
+                  solid
+                    ? "text-muted-foreground hover:text-navy-500"
+                    : "text-white/60 hover:text-white"
+                )}
+              >
+                Inloggen
+              </Link>
+            )}
 
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className={cn(
-                "relative z-50 inline-flex rounded-md p-2 transition-colors duration-500 ease-in-out md:hidden",
+                "relative z-50 inline-flex p-2 transition-colors md:hidden",
                 menuOpen
                   ? "text-white/60 hover:text-white"
-                  : showSolid
+                  : solid
                     ? "text-muted-foreground hover:text-navy-500"
                     : "text-white/60 hover:text-white"
               )}
@@ -245,12 +226,14 @@ export function Navbar({ transparent = false }: NavbarProps) {
             >
               <div className="flex items-center gap-6">
                 <Link
-                  href="/account"
+                  href={isAuthenticated ? "/account" : "/account/login"}
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 text-sm font-medium text-white/50 transition-colors hover:text-white"
                 >
                   <User className="size-4" />
-                  Account
+                  {isAuthenticated
+                    ? customer?.first_name ?? "Account"
+                    : "Inloggen"}
                 </Link>
                 <Link
                   href="/search"

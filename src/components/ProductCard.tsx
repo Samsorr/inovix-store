@@ -71,9 +71,9 @@ function ProductCardInner({
   const refCode = `${name.replace(/[^A-Z0-9]/gi, "").slice(0, 2).toUpperCase()}-${String(Math.abs(hashCode(name)) % 1000).padStart(3, "0")}`
 
   return (
-    <div
+    <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "group flex flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
         className
       )}
     >
@@ -90,7 +90,7 @@ function ProductCardInner({
       </div>
 
       {/* Product image */}
-      <div className="mx-4 mt-3 flex h-[200px] items-center justify-center overflow-hidden rounded-md bg-surface-secondary sm:mx-5 sm:h-[220px]">
+      <div className="mx-4 mt-3 flex h-[200px] items-center justify-center overflow-hidden bg-surface-secondary sm:mx-5 sm:h-[220px]">
         {image ? (
           <Image
             src={image}
@@ -156,14 +156,14 @@ function ProductCardInner({
                 : "Toevoegen"}
         </Button>
       </div>
-    </div>
+    </article>
   )
 }
 
 export function ProductCard({ href, ...props }: ProductCardProps) {
   if (href) {
     return (
-      <Link href={href} className="block focus-visible:outline-none">
+      <Link href={href} className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400">
         <ProductCardInner {...props} />
       </Link>
     )

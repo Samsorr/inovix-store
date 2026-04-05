@@ -63,7 +63,7 @@ export function CartSheet() {
 
         {/* ---- Error banner ---- */}
         {error && (
-          <div className="mx-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="mx-4 border-l-2 border-red-500 bg-white py-2 pl-3 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -74,20 +74,14 @@ export function CartSheet() {
             {items.map((item) => (
               <li key={item.id} className="flex gap-4 py-4">
                 {/* Thumbnail */}
-                <div className="relative size-16 shrink-0 overflow-hidden rounded-md bg-surface-secondary">
-                  {item.thumbnail ? (
-                    <Image
-                      src={item.thumbnail}
-                      alt={item.title}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex size-full items-center justify-center">
-                      <FlaskConical className="size-6 text-navy-500/40" />
-                    </div>
-                  )}
+                <div className="relative size-16 shrink-0 overflow-hidden bg-surface-secondary">
+                  <Image
+                    src={item.thumbnail || "/images/product-peptide.png"}
+                    alt={item.title}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
                 </div>
 
                 {/* Details */}
@@ -115,7 +109,7 @@ export function CartSheet() {
                         type="button"
                         disabled={isUpdating}
                         onClick={() => handleDecrease(item.id, item.quantity)}
-                        className="flex size-7 items-center justify-center rounded-md border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
+                        className="flex size-8 items-center justify-center border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
                         aria-label="Verminder hoeveelheid"
                       >
                         <Minus className="size-3.5" />
@@ -127,7 +121,7 @@ export function CartSheet() {
                         type="button"
                         disabled={isUpdating}
                         onClick={() => handleIncrease(item.id, item.quantity)}
-                        className="flex size-7 items-center justify-center rounded-md border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
+                        className="flex size-8 items-center justify-center border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
                         aria-label="Verhoog hoeveelheid"
                       >
                         <Plus className="size-3.5" />
@@ -139,7 +133,7 @@ export function CartSheet() {
                       type="button"
                       disabled={isUpdating}
                       onClick={() => removeItem(item.id)}
-                      className="text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-red-600 hover:underline disabled:opacity-50"
+                      className="text-xs text-navy-500 underline underline-offset-4 decoration-border transition-colors hover:text-red-600 hover:decoration-red-600 disabled:opacity-50"
                     >
                       Verwijder
                     </button>
@@ -175,9 +169,11 @@ export function CartSheet() {
               </span>
             </div>
 
-            <Button variant="primary" size="lg" fullWidth disabled>
-              Naar checkout
-            </Button>
+            <Link href="/checkout" onClick={closeCart}>
+              <Button variant="primary" size="lg" fullWidth className="font-semibold uppercase tracking-wider">
+                Naar checkout
+              </Button>
+            </Link>
 
             <button
               type="button"
@@ -189,8 +185,8 @@ export function CartSheet() {
 
             <Separator />
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <FlaskConical className="size-3.5 shrink-0" />
+            <div className="flex items-center justify-center gap-2 border border-amber-300 bg-amber-50/50 px-3 py-2 text-xs text-amber-900">
+              <FlaskConical className="size-3.5 shrink-0 text-amber-600" />
               <span>Uitsluitend voor laboratoriumonderzoek</span>
             </div>
           </SheetFooter>
