@@ -1,13 +1,14 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Sora } from "next/font/google"
 import "./globals.css"
 
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { ResearchBanner } from "@/components/ResearchBanner"
+import { Providers } from "@/components/Providers"
 
-const inter = Inter({
-  variable: "--font-inter",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 })
@@ -24,16 +25,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="nl" className={`${inter.variable} h-full antialiased`}>
+    <html lang="nl" className={`${sora.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <div id="default-banner">
-          <ResearchBanner />
-        </div>
-        <div id="default-navbar">
-          <Navbar />
-        </div>
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <Providers>
+          <div id="default-banner">
+            <ResearchBanner />
+          </div>
+          <div id="default-navbar">
+            <Navbar />
+          </div>
+          <main className="flex-1">{children}</main>
+          <div id="default-footer">
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   )

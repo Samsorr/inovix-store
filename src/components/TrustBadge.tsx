@@ -22,8 +22,8 @@ export function TrustBadge({
         className
       )}
     >
-      <div className="flex size-14 items-center justify-center rounded-full bg-teal-50">
-        <Icon className="size-6 text-teal-400" />
+      <div className="flex size-14 items-center justify-center border border-border">
+        <Icon className="size-6 text-navy-500" />
       </div>
       <h3 className="text-sm font-semibold text-navy-500">{title}</h3>
       <p className="text-sm text-muted-foreground">{description}</p>

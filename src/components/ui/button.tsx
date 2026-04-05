@@ -7,25 +7,25 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all duration-150 outline-none select-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center font-medium whitespace-nowrap transition-[background-size,background-color,color,transform,box-shadow,border-color,opacity] duration-200 ease-out outline-none select-none focus-visible:ring-2 focus-visible:ring-navy-500/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 active:duration-75 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         primary:
-          "bg-teal-400 text-white hover:bg-teal-500 active:bg-teal-600",
+          "text-white bg-teal-400 bg-[image:linear-gradient(to_right,var(--color-teal-300)_100%,transparent_100%)] bg-[length:0%_100%] bg-[position:0_0] bg-no-repeat hover:bg-[length:100%_100%] hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(55,120,140,0.4)] active:translate-y-0 active:shadow-none",
         secondary:
-          "bg-navy-500 text-white hover:bg-navy-400 active:bg-navy-600",
+          "bg-navy-500 text-white hover:bg-navy-400 hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(22,32,67,0.4)] active:translate-y-0 active:bg-navy-600 active:shadow-none",
         outline:
-          "border-teal-400 text-teal-400 bg-transparent hover:bg-teal-50 active:bg-teal-100",
+          "border border-teal-400 text-teal-400 bg-transparent bg-[image:linear-gradient(to_right,var(--color-teal-400)_100%,transparent_100%)] bg-[length:0%_100%] bg-[position:0_0] bg-no-repeat hover:bg-[length:100%_100%] hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(55,120,140,0.25)] active:translate-y-0 active:shadow-none",
         ghost:
           "text-navy-500 bg-transparent hover:bg-surface-secondary active:bg-surface-tertiary",
         danger:
-          "bg-red-600 text-white hover:bg-red-700 active:bg-red-800",
+          "bg-red-600 text-white hover:bg-red-700 hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(220,38,38,0.35)] active:translate-y-0 active:bg-red-800 active:shadow-none",
         link: "text-teal-400 underline-offset-4 hover:underline",
         primaryOnDark:
-          "bg-white text-navy-500 hover:bg-white/90 active:bg-white/80",
+          "text-navy-500 bg-white bg-[image:linear-gradient(to_right,var(--color-mauve-500)_100%,transparent_100%)] bg-[length:0%_100%] bg-[position:0_0] bg-no-repeat hover:bg-[length:100%_100%] hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(142,90,128,0.35)] active:translate-y-0 active:shadow-none",
         ghostOnDark:
-          "border-white/30 text-white bg-transparent hover:bg-white/10 active:bg-white/15",
+          "border border-white/30 text-white bg-transparent bg-[image:linear-gradient(to_right,rgba(255,255,255,0.15)_100%,transparent_100%)] bg-[length:0%_100%] bg-[position:0_0] bg-no-repeat hover:bg-[length:100%_100%] hover:border-white/50 active:bg-[length:100%_100%]",
       },
       size: {
         sm: "h-8 gap-1.5 px-3 py-1.5 text-sm",

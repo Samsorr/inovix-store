@@ -422,6 +422,8 @@ export default function DesignSystemPage() {
               dosage="5mg Lyophilized"
               purity={99.8}
               status="in-stock"
+              productId="bpc-157"
+              variants={[{ id: "variant-bpc-157" }]}
               href="/products/bpc-157"
             />
             <ProductCard
@@ -431,6 +433,8 @@ export default function DesignSystemPage() {
               dosage="2mg Lyophilized"
               purity={98.7}
               status="in-stock"
+              productId="tb-500"
+              variants={[{ id: "variant-tb-500" }]}
               bestSeller
             />
             <ProductCard
@@ -440,6 +444,8 @@ export default function DesignSystemPage() {
               dosage="10mg"
               purity={99.2}
               status="out-of-stock"
+              productId="semaglutide"
+              variants={[{ id: "variant-semaglutide" }]}
             />
             <ProductCard
               name="GHK-Cu"
@@ -448,6 +454,8 @@ export default function DesignSystemPage() {
               dosage="50mg Powder"
               purity={99.1}
               status="low-stock"
+              productId="ghk-cu"
+              variants={[{ id: "variant-ghk-cu" }]}
             />
           </div>
         </Section>

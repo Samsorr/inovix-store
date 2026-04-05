@@ -1,9 +1,8 @@
-import Image from "next/image"
-import Link from "next/link"
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
-import { formatPrice } from "@/lib/price"
+import { centsToEuros } from "@/lib/price"
 import { ResearchDisclaimer } from "@/components/ResearchDisclaimer"
+import { ProductCard } from "@/components/ProductCard"
 
 export const revalidate = 60
 
@@ -16,7 +15,7 @@ async function getProducts() {
     const regionId = await getDefaultRegionId()
     const { products } = await medusa.store.product.list({
       region_id: regionId,
-      fields: "id,title,thumbnail,variants.calculated_price",
+      fields: "id,title,description,subtitle,thumbnail,metadata,variants.id,variants.calculated_price,variants.inventory_quantity",
     })
     return products
   } catch {
@@ -39,42 +38,31 @@ export default async function ProductsPage() {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.map((product) => {
-          const price = product.variants?.[0]?.calculated_price?.calculated_amount
+          const variant = product.variants?.[0]
+          const price = variant?.calculated_price?.calculated_amount
+          const metadata = product.metadata as Record<string, unknown> | null
+          const inventoryQty = (variant as unknown as { inventory_quantity?: number })?.inventory_quantity
+          const status = inventoryQty != null && inventoryQty <= 0
+            ? "out-of-stock"
+            : inventoryQty != null && inventoryQty <= 10
+              ? "low-stock"
+              : "in-stock"
+          const variants = (product.variants ?? []).map((v) => ({ id: v.id }))
 
           return (
-            <Link
+            <ProductCard
               key={product.id}
+              name={product.title ?? "Onbekend product"}
+              description={product.description ?? ""}
+              price={price != null ? centsToEuros(price) : 0}
+              dosage={product.subtitle ?? ""}
+              purity={Number(metadata?.purity) || 0}
+              status={status}
+              image={product.thumbnail || "/images/product-peptide.png"}
+              productId={product.id}
+              variants={variants}
               href={`/products/${product.id}`}
-              className="overflow-hidden rounded-lg border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="relative h-48 bg-surface-secondary">
-                {product.thumbnail ? (
-                  <Image
-                    src={product.thumbnail}
-                    alt={product.title ?? "Product afbeelding"}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                    Geen afbeelding
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <h2 className="mb-1 line-clamp-2 text-sm font-semibold text-navy-500">
-                  {product.title}
-                </h2>
-                {price != null ? (
-                  <p className="text-sm font-medium text-navy-400">
-                    {formatPrice(price)}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Prijs op aanvraag</p>
-                )}
-              </div>
-            </Link>
+            />
           )
         })}
       </div>

@@ -1,8 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { FlaskConical, ShoppingCart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useCart } from "@/lib/context/cart-context"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
@@ -22,7 +26,8 @@ export interface ProductCardProps {
   status: "in-stock" | "out-of-stock" | "low-stock"
   bestSeller?: boolean
   image?: string
-  onAddToCart?: () => void
+  productId: string
+  variants?: Array<{ id: string }>
   href?: string
   className?: string
 }
@@ -37,9 +42,27 @@ function ProductCardInner({
   status,
   bestSeller,
   image,
-  onAddToCart,
+  productId,
+  variants = [],
   className,
 }: Omit<ProductCardProps, "href">) {
+  const router = useRouter()
+  const { addItem, isUpdating } = useCart()
+  const hasMultipleVariants = variants.length > 1
+  const firstVariantId = variants[0]?.id
+
+  async function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (hasMultipleVariants) {
+      router.push(`/products/${productId}`)
+      return
+    }
+    if (firstVariantId) {
+      await addItem(firstVariantId, 1)
+    }
+  }
+
   const statusInfo = statusConfig[status]
   const formattedPrice = new Intl.NumberFormat("nl-NL", {
     minimumFractionDigits: 2,
@@ -48,9 +71,9 @@ function ProductCardInner({
   const refCode = `${name.replace(/[^A-Z0-9]/gi, "").slice(0, 2).toUpperCase()}-${String(Math.abs(hashCode(name)) % 1000).padStart(3, "0")}`
 
   return (
-    <div
+    <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "group flex flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
         className
       )}
     >
@@ -67,7 +90,7 @@ function ProductCardInner({
       </div>
 
       {/* Product image */}
-      <div className="mx-4 mt-3 flex h-[200px] items-center justify-center overflow-hidden rounded-md bg-surface-secondary sm:mx-5 sm:h-[220px]">
+      <div className="mx-4 mt-3 flex h-[200px] items-center justify-center overflow-hidden bg-surface-secondary sm:mx-5 sm:h-[220px]">
         {image ? (
           <Image
             src={image}
@@ -119,22 +142,28 @@ function ProductCardInner({
           variant="primary"
           size="md"
           fullWidth
-          disabled={status === "out-of-stock"}
-          onClick={onAddToCart}
+          disabled={status === "out-of-stock" || isUpdating}
+          onClick={handleAddToCart}
           aria-label={`${name} toevoegen aan winkelwagen`}
         >
           <ShoppingCart className="size-4" />
-          {status === "out-of-stock" ? "Niet beschikbaar" : "Toevoegen"}
+          {status === "out-of-stock"
+            ? "Niet beschikbaar"
+            : isUpdating
+              ? "Toevoegen..."
+              : hasMultipleVariants
+                ? "Kies variant"
+                : "Toevoegen"}
         </Button>
       </div>
-    </div>
+    </article>
   )
 }
 
 export function ProductCard({ href, ...props }: ProductCardProps) {
   if (href) {
     return (
-      <Link href={href} className="block focus-visible:outline-none">
+      <Link href={href} className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400">
         <ProductCardInner {...props} />
       </Link>
     )
