@@ -90,7 +90,7 @@ export default async function HomePage() {
               <span className="text-xs font-medium uppercase tracking-widest text-teal-200">
                 Premium Research Grade
               </span>
-              <h1 className="mt-4 text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl md:text-5xl">
+              <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-white md:text-5xl">
                 De Toekomst{" "}
                 <br className="hidden md:block" />
                 van{" "}
@@ -98,7 +98,7 @@ export default async function HomePage() {
                 <br />
                 Onderzoek
               </h1>
-              <p className="mt-4 max-w-md text-base leading-relaxed text-white/60">
+              <p className="mt-5 max-w-md text-base leading-relaxed text-white/60">
                 Hoogwaardige verbindingen met een zuiverheid van meer dan 99%,
                 gevalideerd door onafhankelijke laboratoria voor
                 precisie-onderzoek.

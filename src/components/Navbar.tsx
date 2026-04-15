@@ -38,6 +38,15 @@ export function Navbar({ transparent = false }: NavbarProps) {
     }
   }, [menuOpen])
 
+  useEffect(() => {
+    if (!menuOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false)
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [menuOpen])
+
   const solid = !transparent
 
   return (
@@ -178,6 +187,9 @@ export function Navbar({ transparent = false }: NavbarProps) {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Hoofdmenu"
             className="fixed inset-0 z-40 flex flex-col bg-navy-500 md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

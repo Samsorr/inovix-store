@@ -60,7 +60,7 @@ export default function OverOnsPage() {
       <HideDefaultNavbar />
       <section className="gradient-brand-subtle">
         <Navbar transparent />
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 md:py-32 lg:px-8 lg:py-36">
+        <div className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <ScrollReveal>
               <span className="text-xs font-medium uppercase tracking-widest text-teal-200">
@@ -68,14 +68,14 @@ export default function OverOnsPage() {
               </span>
             </ScrollReveal>
             <ScrollReveal delay={0.1}>
-              <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+              <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-white md:text-5xl">
                 Wetenschap verdient precisie.{" "}
                 <br className="hidden sm:block" />
                 In elke stap.
               </h1>
             </ScrollReveal>
             <ScrollReveal delay={0.2}>
-              <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg md:mt-8">
+              <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/60">
                 Inovix voorziet Europese onderzoekslaboratoria van hoogzuivere
                 peptiden: gesynthetiseerd, gezuiverd en geverifieerd volgens de
                 strengste kwaliteitsnormen.

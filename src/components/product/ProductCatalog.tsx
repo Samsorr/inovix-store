@@ -76,7 +76,7 @@ export function ProductCatalog({ products, categories }: ProductCatalogProps) {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortOption)}
-              className="border border-border bg-white px-4 py-2.5 pr-8 text-xs text-navy-500 focus:border-teal-400 focus:outline-none"
+              className="appearance-none border border-border bg-white bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[position:right_0.75rem_center] bg-no-repeat px-3 py-2.5 pr-8 text-xs text-navy-500 focus:border-teal-400 focus:outline-none"
             >
               <option value="default">Standaard</option>
               <option value="price-asc">Prijs: laag - hoog</option>
