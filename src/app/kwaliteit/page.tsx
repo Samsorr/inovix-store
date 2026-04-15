@@ -129,7 +129,7 @@ export default function KwaliteitPage() {
 
       {/* ⑥ Research Disclaimer (matches homepage pattern) */}
       <section className="border-y border-mauve-200 bg-mauve-50">
-        <div className="mx-auto flex max-w-3xl items-center justify-center gap-3 px-4 py-8 text-center sm:py-10">
+        <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-3 px-4 py-8 text-center sm:flex-row sm:py-10">
           <FlaskConical className="size-5 shrink-0 text-mauve-400" />
           <p className="text-sm leading-relaxed text-mauve-500">
             Alle producten van Inovix zijn uitsluitend bestemd voor

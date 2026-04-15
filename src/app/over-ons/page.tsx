@@ -310,11 +310,13 @@ export default function OverOnsPage() {
                   </Button>
                 </Link>
               </div>
-              <p className="mt-10 flex items-center justify-center gap-1.5 text-xs text-white/40">
+              <p className="mt-10 flex flex-col items-center justify-center gap-1.5 text-xs text-white/40 sm:flex-row">
                 <FlaskConical className="size-3 shrink-0" />
-                Alle producten zijn uitsluitend bestemd voor
-                laboratoriumonderzoek. Niet voor menselijke of veterinaire
-                consumptie.
+                <span>
+                  Alle producten zijn uitsluitend bestemd voor
+                  laboratoriumonderzoek. Niet voor menselijke of veterinaire
+                  consumptie.
+                </span>
               </p>
             </div>
           </ScrollReveal>
