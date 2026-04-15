@@ -42,7 +42,7 @@ export default function ContactPage() {
 
       {/* Info badges */}
       <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:gap-4 md:mb-14">
-        <div className="flex items-center gap-3 border border-border bg-surface-secondary px-5 py-3.5">
+        <div className="flex items-center gap-3 border-l-2 border-teal-400 bg-navy-50 px-5 py-3.5">
           <Mail className="size-4 shrink-0 text-teal-400" />
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -53,7 +53,7 @@ export default function ContactPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 border border-border bg-surface-secondary px-5 py-3.5">
+        <div className="flex items-center gap-3 border-l-2 border-teal-400 bg-navy-50 px-5 py-3.5">
           <Clock className="size-4 shrink-0 text-teal-400" />
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -84,7 +84,7 @@ export default function ContactPage() {
 
         {/* Sidebar context */}
         <aside className="md:col-span-2">
-          <div className="border border-border p-6 md:p-8">
+          <div className="border-l-2 border-teal-400 bg-navy-50 p-6 md:p-8">
             <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-navy-500">
               Veelgestelde onderwerpen
             </p>
