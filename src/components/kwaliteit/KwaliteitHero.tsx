@@ -49,15 +49,15 @@ export function KwaliteitHero() {
           key={item.text}
           aria-hidden="true"
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.8, 0.8] }}
-          transition={{ duration: 1.2, delay: 0.8 + i * 0.15, times: [0, 1, 1] }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.8 + i * 0.15 }}
           className={cn(
-            "absolute hidden whitespace-nowrap font-mono text-[10px] lg:block",
+            "absolute hidden whitespace-nowrap font-mono text-[10px] md:block",
             item.className
           )}
         >
           <motion.span
-            animate={{ opacity: [0.18, 0.3, 0.18] }}
+            animate={{ opacity: [0.22, 0.38, 0.22] }}
             transition={{
               duration: 8,
               repeat: Infinity,
@@ -74,8 +74,8 @@ export function KwaliteitHero() {
       {/* ═══ HPLC Chromatogram — full width, edge to edge ═══ */}
       <motion.svg
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[60%] w-full sm:h-[55%] md:h-[65%]"
-        viewBox="0 0 1200 200"
+        className="absolute inset-x-0 bottom-0 h-[55%] w-full sm:h-[55%] md:h-[65%]"
+        viewBox="0 -20 1200 220"
         preserveAspectRatio="none"
         fill="none"
         initial="hidden"
@@ -97,22 +97,23 @@ export function KwaliteitHero() {
             <motion.line
               x1="0" y1={y} x2="1200" y2={y}
               stroke="white"
-              strokeWidth="0.5"
+              strokeWidth="1"
               strokeDasharray="4 8"
+              vectorEffect="non-scaling-stroke"
               variants={{
                 hidden: { opacity: 0 },
-                visible: { opacity: 0.07, transition: { duration: 1, delay: 0.3 } },
+                visible: { opacity: 0.15, transition: { duration: 1, delay: 0.3 } },
               }}
             />
             {/* Y-axis label */}
             <motion.text
               x="16" y={y - 4}
               fill="white"
-              fontSize="7"
+              fontSize="9px"
               fontFamily="monospace"
               variants={{
                 hidden: { opacity: 0 },
-                visible: { opacity: 0.1, transition: { duration: 1, delay: 0.6 } },
+                visible: { opacity: 0.3, transition: { duration: 1, delay: 0.6 } },
               }}
             >
               {label}
@@ -124,10 +125,11 @@ export function KwaliteitHero() {
         <motion.line
           x1="0" y1={185} x2="1200" y2={185}
           stroke="white"
-          strokeWidth="0.5"
+          strokeWidth="1"
+          vectorEffect="non-scaling-stroke"
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 0.1, transition: { duration: 1, delay: 0.2 } },
+            visible: { opacity: 0.2, transition: { duration: 1, delay: 0.2 } },
           }}
         />
 
@@ -138,6 +140,7 @@ export function KwaliteitHero() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
           fill="none"
           variants={{
             hidden: { pathLength: 0, opacity: 0 },
@@ -194,11 +197,12 @@ export function KwaliteitHero() {
           x="400" y="6"
           textAnchor="middle"
           fill="white"
-          fontSize="8"
+          fontSize="10px"
           fontFamily="monospace"
+          fontWeight="600"
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 0.3, transition: { duration: 0.5, delay: 1.8 } },
+            visible: { opacity: 0.55, transition: { duration: 0.5, delay: 1.8 } },
           }}
         >
           99.3%
@@ -208,7 +212,8 @@ export function KwaliteitHero() {
         <motion.line
           x1="0" y1="0" x2="0" y2="200"
           stroke="#37788C"
-          strokeWidth="1"
+          strokeWidth="1.5"
+          vectorEffect="non-scaling-stroke"
           initial={{ opacity: 0 }}
           animate={{
             x: [0, 1200],
@@ -229,7 +234,8 @@ export function KwaliteitHero() {
         <motion.line
           x1="0" y1="0" x2="0" y2="200"
           stroke="#37788C"
-          strokeWidth="12"
+          strokeWidth="14"
+          vectorEffect="non-scaling-stroke"
           initial={{ opacity: 0 }}
           animate={{
             x: [0, 1200],
