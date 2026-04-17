@@ -1,0 +1,11 @@
+{
+  "name": "renmaiv/nextjs-app-refactor",
+  "version": "58415cb381707f00e650612a096072cb9db8386f",
+  "summary": "Splits mixed Server/Client pages into separate files with clean boundaries — extracting client logic into a `<DescriptiveName>Client.tsx` and rewriting `page.tsx` as a pure Server Component — and flags repeated JSX structures for extraction into shared typed components. Apply when working in a Next.js App Router project and you detect `export const metadata` alongside `\"use client\"`, hooks in a Server Component, a page file that has grown unwieldy (>200–300 LOC) with interactive logic, or the same layout block duplicated inline multiple times.\n",
+  "private": false,
+  "skills": {
+    "nextjs-app-refactor": {
+      "path": "SKILL.md"
+    }
+  }
+}

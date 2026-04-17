@@ -108,7 +108,7 @@ describe("submitContactForm", () => {
 
       expect(resend.emails.send).toHaveBeenCalledTimes(1)
       expect(resend.emails.send).toHaveBeenCalledWith({
-        from: "Inovix Contact <noreply@inovix.eu>",
+        from: "Inovix <noreply@inovix-peptides.com>",
         to: "info@inovix.eu",
         replyTo: "jan@example.com",
         subject: "[Contact] Vraag over een product",

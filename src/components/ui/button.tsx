@@ -17,6 +17,8 @@ const buttonVariants = cva(
           "bg-navy-500 text-white hover:bg-navy-400 hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(22,32,67,0.4)] active:translate-y-0 active:bg-navy-600 active:shadow-none",
         outline:
           "border border-teal-400 text-teal-400 bg-transparent bg-[image:linear-gradient(to_right,var(--color-teal-400)_100%,transparent_100%)] bg-[length:0%_100%] bg-[position:0_0] bg-no-repeat hover:bg-[length:100%_100%] hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(55,120,140,0.25)] active:translate-y-0 active:shadow-none",
+        outlineSecondary:
+          "border border-navy-500 text-navy-500 bg-transparent bg-[image:linear-gradient(to_right,var(--color-navy-500)_100%,transparent_100%)] bg-[length:0%_100%] bg-[position:0_0] bg-no-repeat hover:bg-[length:100%_100%] hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_-3px_rgba(22,32,67,0.25)] active:translate-y-0 active:shadow-none",
         ghost:
           "text-navy-500 bg-transparent hover:bg-surface-secondary active:bg-surface-tertiary",
         danger:

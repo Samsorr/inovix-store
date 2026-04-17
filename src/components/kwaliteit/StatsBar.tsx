@@ -19,7 +19,7 @@ export function StatsBar() {
             }`}
           >
             <p className="font-mono text-[9px] font-medium uppercase tracking-[0.06em] text-teal-400/70">
-              {stat.id} // {stat.label}
+              {stat.id} {"//"} {stat.label}
             </p>
             <p className="mt-3 text-[26px] font-bold leading-none tracking-[-0.02em] text-navy-500 sm:text-[32px]">
               {stat.value}

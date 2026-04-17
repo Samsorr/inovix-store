@@ -1,0 +1,71 @@
+{
+  "name": "inovix-store",
+  "mode": "vendored",
+  "dependencies": {
+    "vercel-labs/next-skills": {
+      "version": "038954e07bfc313e97fa5f6ff7caf87226e4a782",
+      "source": "https://github.com/vercel-labs/next-skills",
+      "include": {
+        "skills": [
+          "next-best-practices"
+        ]
+      }
+    },
+    "renmaiv/nextjs-app-refactor": {
+      "version": "58415cb381707f00e650612a096072cb9db8386f",
+      "source": "https://github.com/renmaiv/nextjs-app-refactor"
+    },
+    "secondsky/claude-skills": {
+      "version": "88da5ffe9767d2b75bd5a5545165ca4bcd868168",
+      "source": "https://github.com/secondsky/claude-skills",
+      "include": {
+        "skills": [
+          "tailwind-v4-shadcn"
+        ]
+      }
+    },
+    "wshobson/agents": {
+      "version": "9a8ad818326b9e3d3492ee5563a2f6cf44af1c81",
+      "source": "https://github.com/wshobson/agents",
+      "include": {
+        "skills": [
+          "gdpr-data-handling"
+        ]
+      }
+    },
+    "creativecodeology/react-email": {
+      "version": "0.1.0"
+    },
+    "resend/resend-skills": {
+      "version": "1a3fdfde1b8877ed1123f6afed20d4aa371d061a",
+      "source": "https://github.com/resend/resend-skills",
+      "include": {
+        "skills": [
+          "resend"
+        ]
+      }
+    },
+    "planetscale/database-skills": {
+      "version": "b156f4ca73c03d0350438bfd042331aaef6eec77",
+      "source": "https://github.com/planetscale/database-skills",
+      "include": {
+        "skills": [
+          "postgres"
+        ]
+      }
+    },
+    "tech-leads-club/agent-skills": {
+      "version": "d41f62b84cff05ca6ea5a380f48daceae3fcce20",
+      "source": "https://github.com/tech-leads-club/agent-skills",
+      "include": {
+        "skills": [
+          "accessibility"
+        ]
+      }
+    },
+    "vercel/next.js": {
+      "version": "7f8ba2dc8600d99fdb4f2e496a7aff8dfee3bac8",
+      "source": "https://github.com/vercel/next.js"
+    }
+  }
+}

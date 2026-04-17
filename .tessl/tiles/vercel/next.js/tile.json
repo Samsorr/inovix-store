@@ -1,0 +1,44 @@
+{
+  "name": "vercel/next.js",
+  "version": "7f8ba2dc8600d99fdb4f2e496a7aff8dfee3bac8",
+  "summary": "Auto-generated tile from GitHub (12 skills)",
+  "private": true,
+  "skills": {
+    "authoring-skills": {
+      "path": ".agents/skills/authoring-skills/SKILL.md"
+    },
+    "dce-edge": {
+      "path": ".agents/skills/dce-edge/SKILL.md"
+    },
+    "flags": {
+      "path": ".agents/skills/flags/SKILL.md"
+    },
+    "next-compile": {
+      "path": "skills/next-compile/SKILL.md"
+    },
+    "pr-status-triage": {
+      "path": ".agents/skills/pr-status-triage/SKILL.md"
+    },
+    "react-vendoring": {
+      "path": ".agents/skills/react-vendoring/SKILL.md"
+    },
+    "router-act": {
+      "path": ".agents/skills/router-act/SKILL.md"
+    },
+    "runtime-debug": {
+      "path": ".agents/skills/runtime-debug/SKILL.md"
+    },
+    "update-docs": {
+      "path": ".agents/skills/update-docs/SKILL.md"
+    },
+    "v8-jit": {
+      "path": ".agents/skills/v8-jit/SKILL.md"
+    },
+    "write-api-reference": {
+      "path": ".agents/skills/write-api-reference/SKILL.md"
+    },
+    "write-guide": {
+      "path": ".agents/skills/write-guide/SKILL.md"
+    }
+  }
+}

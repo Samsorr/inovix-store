@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Loader2 } from "lucide-react"
@@ -20,6 +20,12 @@ export default function WachtwoordHerstellenPage() {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+
+  useEffect(() => {
+    if (!isSuccess) return
+    const timer = setTimeout(() => router.push("/account/login"), 2500)
+    return () => clearTimeout(timer)
+  }, [isSuccess, router])
 
   if (!token || !email) {
     return (
@@ -68,7 +74,6 @@ export default function WachtwoordHerstellenPage() {
         token
       )
       setIsSuccess(true)
-      setTimeout(() => router.push("/account/login"), 2500)
     } catch {
       setError(
         "Wachtwoord herstellen is mislukt. De link is mogelijk verlopen. Vraag een nieuwe herstellink aan."

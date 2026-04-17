@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { Check, Loader2 } from "lucide-react"
 
@@ -265,8 +265,38 @@ function OrderSummary({
 // Main Checkout Page
 // ---------------------------------------------------------------------------
 
+const VIVA_ERROR_MESSAGES: Record<string, string> = {
+  cancelled: "De betaling is geannuleerd. U kunt het opnieuw proberen.",
+  missing_cart:
+    "We konden uw winkelwagen niet terugvinden na de betaling. Probeer het opnieuw.",
+  auth_failed:
+    "We konden uw betaling niet bevestigen. Probeer het opnieuw of neem contact op met support.",
+  not_authorized:
+    "De betaling werd niet geautoriseerd. Probeer het opnieuw met een andere betaalmethode.",
+  error:
+    "Er ging iets mis bij het afronden van uw bestelling. Probeer het opnieuw.",
+}
+
+// Defense-in-depth: only redirect to known Viva Smart Checkout hosts. The URL
+// comes from our backend, but if that's compromised this prevents an open
+// redirect to an attacker-controlled domain.
+const ALLOWED_VIVA_HOSTS = new Set([
+  "www.vivapayments.com",
+  "demo.vivapayments.com",
+])
+
+function isAllowedVivaCheckoutUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return parsed.protocol === "https:" && ALLOWED_VIVA_HOSTS.has(parsed.hostname)
+  } catch {
+    return false
+  }
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { cart, isLoading, closeCart, updateCartState, resetCart, cartCount } =
     useCart()
   const { customer } = useAuth()
@@ -307,6 +337,16 @@ export default function CheckoutPage() {
   useEffect(() => {
     closeCart()
   }, [closeCart])
+
+  // Surface Viva return errors (customer cancelled or authorisation failed)
+  useEffect(() => {
+    const viva = searchParams.get("viva")
+    if (viva && VIVA_ERROR_MESSAGES[viva]) {
+      setGlobalError(VIVA_ERROR_MESSAGES[viva])
+      router.replace("/checkout")
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Pre-fill email from cart
   useEffect(() => {
@@ -606,6 +646,57 @@ export default function CheckoutPage() {
 
     setIsProcessing(true)
     setGlobalError("")
+
+    // Viva Wallet: redirect to Smart Checkout instead of completing locally.
+    if (selectedPayment === "pp_viva-wallet_viva") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sessions = (cart.payment_collection as any)?.payment_sessions as
+        | Array<{ provider_id: string; data?: { checkoutUrl?: string } }>
+        | undefined
+      const vivaSession = sessions?.find(
+        (s) => s.provider_id === "pp_viva-wallet_viva"
+      )
+      const checkoutUrl = vivaSession?.data?.checkoutUrl
+
+      if (!checkoutUrl || !isAllowedVivaCheckoutUrl(checkoutUrl)) {
+        setGlobalError(
+          "Kon de Viva-betaling niet starten. Probeer het opnieuw."
+        )
+        setIsProcessing(false)
+        return
+      }
+
+      // Stash enough data to render the confirmation page after the return
+      // redirect, since the cart will be emptied once the order is created.
+      try {
+        sessionStorage.setItem(
+          "inovix_pending_viva_cart",
+          JSON.stringify({
+            cartId: cart.id,
+            email: cart.email ?? email,
+            items: cart.items?.map((item) => ({
+              title: item.title,
+              variantTitle: item.variant?.title,
+              quantity: item.quantity,
+              unitPrice: item.unit_price ?? 0,
+            })),
+            shippingAddress: cart.shipping_address,
+            total: cart.total ?? 0,
+            subtotal: cart.subtotal ?? 0,
+            shippingTotal: cart.shipping_total ?? 0,
+            taxTotal: cart.tax_total ?? 0,
+            currency: cart.currency_code,
+          })
+        )
+      } catch {
+        // sessionStorage may be unavailable; fall through, confirmation will
+        // gracefully handle missing data.
+      }
+
+      window.location.href = checkoutUrl
+      return
+    }
+
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result: any = await medusa.store.cart.complete(cart.id)
@@ -1008,7 +1099,7 @@ export default function CheckoutPage() {
                     <label
                       key={provider.id}
                       className={cn(
-                        "flex cursor-pointer items-center border px-4 py-3 transition-colors",
+                        "flex cursor-pointer items-center justify-between border px-4 py-3 transition-colors",
                         selectedPayment === provider.id
                           ? "border-navy-500 bg-navy-500/[0.02]"
                           : "border-border hover:border-navy-200"
@@ -1031,6 +1122,15 @@ export default function CheckoutPage() {
                           {paymentProviderLabel(provider.id)}
                         </span>
                       </div>
+                      {provider.id.includes("viva") && (
+                        <Image
+                          src="/images/payment-viva.svg"
+                          alt="viva.com"
+                          width={64}
+                          height={20}
+                          className="h-5 w-auto"
+                        />
+                      )}
                     </label>
                   ))}
                 </div>
