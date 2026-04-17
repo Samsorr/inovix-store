@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Loader2 } from "lucide-react"
 
@@ -9,8 +9,18 @@ import { useAuth } from "@/lib/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+// Only allow internal paths as redirect targets so this can't be abused for
+// open-redirect phishing.
+function safeRedirect(raw: string | null): string {
+  if (!raw) return "/account"
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/account"
+  return raw
+}
+
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = safeRedirect(searchParams.get("redirect"))
   const { login, isAuthenticated, isLoading } = useAuth()
 
   const [email, setEmail] = useState("")
@@ -19,10 +29,11 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Redirect if already logged in
-  if (!isLoading && isAuthenticated) {
-    router.push("/account")
-    return null
-  }
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace(redirectTo)
+    }
+  }, [isLoading, isAuthenticated, redirectTo, router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -40,7 +51,7 @@ export default function LoginPage() {
     setIsSubmitting(true)
     try {
       await login(email.trim(), password)
-      router.push("/account")
+      router.push(redirectTo)
     } catch {
       setError(
         "Ongeldige inloggegevens. Controleer uw e-mailadres en wachtwoord."
@@ -50,7 +61,7 @@ export default function LoginPage() {
     }
   }
 
-  if (isLoading) {
+  if (isLoading || isAuthenticated) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="size-5 animate-spin border border-navy-500 border-t-transparent" />

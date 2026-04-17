@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { AnimatePresence, motion } from "motion/react"
 import { Cookie, Settings2, X } from "lucide-react"
@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils"
 import {
   COOKIE_CONSENT_KEY,
   COOKIE_CONSENT_EVENT,
-  readConsent,
   writeConsent,
   type CookieCategory,
   type CookieConsent as CookieConsentValue,
@@ -72,28 +71,43 @@ function subscribeToConsent(callback: () => void) {
   }
 }
 
-let cachedRaw: string | null = null
-let cachedValue: CookieConsentValue | null = null
-
-function getClientConsent(): CookieConsentValue | null {
+// getSnapshot must return a primitive or cached reference; returning a fresh object trips React's infinite-loop guard.
+function getClientConsentRaw(): string | null {
   if (typeof window === "undefined") return null
-  const raw = window.localStorage.getItem(COOKIE_CONSENT_KEY)
-  if (raw === cachedRaw) return cachedValue
-  cachedRaw = raw
-  cachedValue = readConsent()
-  return cachedValue
+  return window.localStorage.getItem(COOKIE_CONSENT_KEY)
 }
 
-function getServerConsent(): CookieConsentValue | null {
+function getServerConsentRaw(): string | null {
   return null
 }
 
+function parseConsent(raw: string | null): CookieConsentValue | null {
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw) as Partial<CookieConsentValue>
+    if (!parsed || typeof parsed !== "object") return null
+    return {
+      necessary: true,
+      functional: Boolean(parsed.functional),
+      analytics: Boolean(parsed.analytics),
+      marketing: Boolean(parsed.marketing),
+      timestamp:
+        typeof parsed.timestamp === "string"
+          ? parsed.timestamp
+          : new Date().toISOString(),
+    }
+  } catch {
+    return null
+  }
+}
+
 export function CookieConsent() {
-  const consent = useSyncExternalStore(
+  const rawConsent = useSyncExternalStore(
     subscribeToConsent,
-    getClientConsent,
-    getServerConsent
+    getClientConsentRaw,
+    getServerConsentRaw
   )
+  const consent = useMemo(() => parseConsent(rawConsent), [rawConsent])
   const [mounted, setMounted] = useState(false)
   const [showPreferences, setShowPreferences] = useState(false)
   const [prefs, setPrefs] = useState<Preferences>(DEFAULT_PREFS)

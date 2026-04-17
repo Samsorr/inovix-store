@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Check, FlaskConical, Loader2 } from "lucide-react"
 
@@ -10,8 +10,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
+function safeRedirect(raw: string | null): string {
+  if (!raw) return "/account"
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/account"
+  return raw
+}
+
 export default function RegistratiePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = safeRedirect(searchParams.get("redirect"))
   const { register, isAuthenticated, isLoading } = useAuth()
 
   const [firstName, setFirstName] = useState("")
@@ -22,10 +30,11 @@ export default function RegistratiePage() {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  if (!isLoading && isAuthenticated) {
-    router.push("/account")
-    return null
-  }
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace(redirectTo)
+    }
+  }, [isLoading, isAuthenticated, redirectTo, router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -60,7 +69,7 @@ export default function RegistratiePage() {
         email: email.trim(),
         password,
       })
-      router.push("/account")
+      router.push(redirectTo)
     } catch {
       setError(
         "Registratie mislukt. Mogelijk bestaat er al een account met dit e-mailadres."
@@ -70,7 +79,7 @@ export default function RegistratiePage() {
     }
   }
 
-  if (isLoading) {
+  if (isLoading || isAuthenticated) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="size-5 animate-spin border border-navy-500 border-t-transparent" />

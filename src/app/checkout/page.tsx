@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { Check, Loader2 } from "lucide-react"
 
 import { useCart } from "@/lib/context/cart-context"
@@ -13,6 +14,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { cn } from "@/lib/utils"
+
+import { CheckoutStepper } from "./CheckoutStepper"
+import { PromoCodeInput } from "./PromoCodeInput"
 
 
 // ---------------------------------------------------------------------------
@@ -164,11 +168,14 @@ function StepSection({
 function OrderSummary({
   cart,
   shippingSelected,
+  onCartUpdated,
 }: {
   cart: NonNullable<ReturnType<typeof useCart>["cart"]>
   shippingSelected: boolean
+  onCartUpdated: (cart: NonNullable<ReturnType<typeof useCart>["cart"]>) => void
 }) {
   const items = cart.items ?? []
+  const discountTotal = cart.discount_total ?? 0
 
   return (
     <div className="border border-border bg-surface-secondary/60 p-6 backdrop-blur-sm">
@@ -215,8 +222,13 @@ function OrderSummary({
         ))}
       </div>
 
-      {/* Totals */}
+      {/* Promo code */}
       <div className="mt-6 border-t border-border pt-4">
+        <PromoCodeInput cart={cart} onCartUpdated={onCartUpdated} />
+      </div>
+
+      {/* Totals */}
+      <div className="mt-4 border-t border-border pt-4">
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Subtotaal</span>
@@ -224,6 +236,14 @@ function OrderSummary({
               {formatPrice(cart.subtotal ?? 0)}
             </span>
           </div>
+          {discountTotal > 0 && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Korting</span>
+              <span className="tabular-nums text-teal-500">
+                -{formatPrice(discountTotal)}
+              </span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-muted-foreground">Verzending</span>
             <span className="tabular-nums text-navy-500">
@@ -333,6 +353,11 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [globalError, setGlobalError] = useState("")
   const [researchConfirmed, setResearchConfirmed] = useState(false)
+
+  // Run the logged-in auto-advance at most once per mount so going back
+  // via "Wijzigen" doesn't kick the user forward again.
+  const autoAdvancedRef = useRef(false)
+
   // Close cart sheet on mount
   useEffect(() => {
     closeCart()
@@ -372,41 +397,101 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart?.shipping_address])
 
-  // Pre-fill email from customer account
+  // Auto-advance for logged-in customers: skip the email step, and skip the
+  // address step if a default saved address is available and complete.
   useEffect(() => {
-    if (customer?.email) {
-      setEmail(customer.email)
+    if (autoAdvancedRef.current) return
+    if (!customer || !cart) return
+    if (cart.email || completedSteps.has(1)) {
+      // User already typed an email or advanced manually — don't override.
+      return
     }
-  }, [customer?.email])
+    autoAdvancedRef.current = true
 
-  // Pre-fill address from customer's saved address
-  useEffect(() => {
-    if (!customer || cart?.shipping_address?.first_name) return
     let cancelled = false
-    medusa.store.customer
-      .listAddress({ limit: 1, offset: 0 })
-      .then(({ addresses }) => {
+
+    async function advance() {
+      if (!customer || !cart) return
+      const email = customer.email
+      if (!email) return
+      try {
+        setEmail(email)
+        const { cart: afterEmail } = await medusa.store.cart.update(cart.id, {
+          email,
+        })
         if (cancelled) return
-        const addr = addresses?.[0]
-        if (addr && !address.firstName) {
-          setAddress({
-            firstName: addr.first_name ?? "",
-            lastName: addr.last_name ?? "",
-            company: addr.company ?? "",
-            address1: addr.address_1 ?? "",
-            postalCode: addr.postal_code ?? "",
-            city: addr.city ?? "",
-            countryCode: addr.country_code ?? "nl",
-            phone: addr.phone ?? "",
-          })
+        updateCartState(afterEmail)
+        setCompletedSteps((prev) => new Set([...prev, 1]))
+
+        // Fetch saved addresses. Prefer default shipping, else first.
+        const { addresses } = await medusa.store.customer.listAddress({
+          limit: 20,
+          offset: 0,
+        })
+        const addr =
+          addresses?.find((a) => a.is_default_shipping) ??
+          addresses?.[0] ??
+          undefined
+        if (cancelled || !addr) {
+          setActiveStep(2)
+          return
         }
-      })
-      .catch(() => {})
+
+        const nextAddress: AddressForm = {
+          firstName: addr.first_name ?? "",
+          lastName: addr.last_name ?? "",
+          company: addr.company ?? "",
+          address1: addr.address_1 ?? "",
+          postalCode: addr.postal_code ?? "",
+          city: addr.city ?? "",
+          countryCode: addr.country_code ?? "nl",
+          phone: addr.phone ?? "",
+        }
+        setAddress(nextAddress)
+
+        const isComplete =
+          !!nextAddress.firstName &&
+          !!nextAddress.lastName &&
+          !!nextAddress.address1 &&
+          !!nextAddress.postalCode &&
+          !!nextAddress.city
+
+        if (!isComplete) {
+          setActiveStep(2)
+          return
+        }
+
+        const shippingAddr = {
+          first_name: nextAddress.firstName,
+          last_name: nextAddress.lastName,
+          company: nextAddress.company || undefined,
+          address_1: nextAddress.address1,
+          postal_code: nextAddress.postalCode,
+          city: nextAddress.city,
+          country_code: nextAddress.countryCode,
+          phone: nextAddress.phone || undefined,
+        }
+        const { cart: afterAddress } = await medusa.store.cart.update(cart.id, {
+          shipping_address: shippingAddr,
+          billing_address: shippingAddr,
+        })
+        if (cancelled) return
+        updateCartState(afterAddress)
+        setCompletedSteps((prev) => new Set([...prev, 1, 2]))
+        setActiveStep(3)
+        fetchShippingOptions()
+      } catch {
+        // Auto-advance is a nice-to-have; on failure fall back to the
+        // default first step without surfacing a hard error.
+      }
+    }
+
+    void advance()
     return () => {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customer])
+  }, [customer, cart?.id])
 
   // -----------------------------------------------------------------------
   // Helpers
@@ -529,12 +614,11 @@ export default function CheckoutPage() {
           cart_id: cart.id,
         })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const options = (shipping_options ?? []).map((opt: any) => ({
-        id: opt.id as string,
-        name: (opt.name ?? "Standaard verzending") as string,
-        amount: (opt.amount ?? 0) as number,
-        price_type: (opt.price_type ?? "flat") as string,
+      const options = (shipping_options ?? []).map((opt) => ({
+        id: opt.id,
+        name: opt.name ?? "Standaard verzending",
+        amount: opt.amount ?? 0,
+        price_type: opt.price_type ?? "flat",
       }))
 
       setShippingOptions(options)
@@ -585,10 +669,7 @@ export default function CheckoutPage() {
           region_id: cart.region_id ?? "",
         })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const providers = (payment_providers ?? []).map((p: any) => ({
-        id: p.id as string,
-      }))
+      const providers = (payment_providers ?? []).map((p) => ({ id: p.id }))
 
       setPaymentProviders(providers)
 
@@ -649,14 +730,11 @@ export default function CheckoutPage() {
 
     // Viva Wallet: redirect to Smart Checkout instead of completing locally.
     if (selectedPayment === "pp_viva-wallet_viva") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sessions = (cart.payment_collection as any)?.payment_sessions as
-        | Array<{ provider_id: string; data?: { checkoutUrl?: string } }>
-        | undefined
+      const sessions = cart.payment_collection?.payment_sessions
       const vivaSession = sessions?.find(
         (s) => s.provider_id === "pp_viva-wallet_viva"
       )
-      const checkoutUrl = vivaSession?.data?.checkoutUrl
+      const checkoutUrl = vivaSession?.data?.checkoutUrl as string | undefined
 
       if (!checkoutUrl || !isAllowedVivaCheckoutUrl(checkoutUrl)) {
         setGlobalError(
@@ -698,8 +776,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result: any = await medusa.store.cart.complete(cart.id)
+      const result = await medusa.store.cart.complete(cart.id)
 
       if (result.type === "order") {
         const order = result.order
@@ -708,15 +785,12 @@ export default function CheckoutPage() {
           JSON.stringify({
             id: order.id,
             displayId: order.display_id,
-            items: order.items?.map(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (item: any) => ({
-                title: item.title,
-                variantTitle: item.variant?.title,
-                quantity: item.quantity,
-                unitPrice: item.unit_price,
-              })
-            ),
+            items: order.items?.map((item) => ({
+              title: item.title,
+              variantTitle: item.variant?.title,
+              quantity: item.quantity,
+              unitPrice: item.unit_price,
+            })),
             shippingAddress: order.shipping_address,
             email: order.email,
             total: order.total,
@@ -812,25 +886,43 @@ export default function CheckoutPage() {
       <div className="lg:grid lg:grid-cols-12 lg:gap-16">
         {/* Left column — Form */}
         <div className="lg:col-span-7">
-          <h1 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-navy-500">
-            Checkout
-          </h1>
+          <div className="flex items-baseline justify-between gap-4">
+            <h1 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-navy-500">
+              Checkout
+            </h1>
+            {customer ? (
+              <p className="text-[12px] text-muted-foreground">
+                Ingelogd als{" "}
+                <span className="font-medium text-navy-500">
+                  {customer.email}
+                </span>
+              </p>
+            ) : (
+              <p className="text-[12px] text-muted-foreground">
+                Al klant?{" "}
+                <Link
+                  href="/account/login?redirect=/checkout"
+                  className="font-medium text-navy-500 underline underline-offset-4 decoration-border hover:decoration-navy-500"
+                >
+                  Inloggen
+                </Link>
+              </p>
+            )}
+          </div>
 
-          {/* Progress bar */}
-          <div className="mt-5 flex items-center gap-1">
-            {[1, 2, 3, 4].map((step) => (
-              <div
-                key={step}
-                className={cn(
-                  "h-0.5 flex-1 transition-all duration-500",
-                  completedSteps.has(step)
-                    ? "bg-teal-400"
-                    : activeStep === step
-                      ? "bg-teal-400/40"
-                      : "bg-border"
-                )}
-              />
-            ))}
+          {/* Progress stepper */}
+          <div className="mt-6">
+            <CheckoutStepper
+              steps={[
+                { num: 1, label: "E-mail" },
+                { num: 2, label: "Adres" },
+                { num: 3, label: "Verzending" },
+                { num: 4, label: "Betaling" },
+              ]}
+              activeStep={activeStep}
+              completedSteps={completedSteps}
+              onEdit={editStep}
+            />
           </div>
 
           {/* Global error */}
@@ -1031,12 +1123,22 @@ export default function CheckoutPage() {
                     <label
                       key={option.id}
                       className={cn(
-                        "flex cursor-pointer items-center justify-between border px-4 py-3 transition-colors",
+                        "flex cursor-pointer items-center justify-between border px-4 py-3 transition-colors focus-within:border-navy-500 focus-within:ring-1 focus-within:ring-navy-500/20",
                         selectedShipping === option.id
                           ? "border-navy-500 bg-navy-500/[0.02]"
-                          : "border-border hover:border-navy-200"
+                          : "border-border hover:border-navy-200",
+                        isProcessing && "pointer-events-none opacity-60"
                       )}
                     >
+                      <input
+                        type="radio"
+                        name="shipping_option"
+                        value={option.id}
+                        checked={selectedShipping === option.id}
+                        onChange={() => selectShippingOption(option.id)}
+                        disabled={isProcessing}
+                        className="sr-only"
+                      />
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
@@ -1099,12 +1201,22 @@ export default function CheckoutPage() {
                     <label
                       key={provider.id}
                       className={cn(
-                        "flex cursor-pointer items-center justify-between border px-4 py-3 transition-colors",
+                        "flex cursor-pointer items-center justify-between border px-4 py-3 transition-colors focus-within:border-navy-500 focus-within:ring-1 focus-within:ring-navy-500/20",
                         selectedPayment === provider.id
                           ? "border-navy-500 bg-navy-500/[0.02]"
-                          : "border-border hover:border-navy-200"
+                          : "border-border hover:border-navy-200",
+                        isProcessing && "pointer-events-none opacity-60"
                       )}
                     >
+                      <input
+                        type="radio"
+                        name="payment_provider"
+                        value={provider.id}
+                        checked={selectedPayment === provider.id}
+                        onChange={() => handlePaymentSelect(provider.id)}
+                        disabled={isProcessing}
+                        className="sr-only"
+                      />
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
@@ -1139,7 +1251,13 @@ export default function CheckoutPage() {
               {/* Research confirmation + Place Order */}
               {selectedPayment && (
                 <div className="mt-8 space-y-5">
-                  <label className="flex cursor-pointer items-center gap-3 border border-amber-300 bg-amber-50/50 px-4 py-3 transition-colors hover:border-amber-400">
+                  <label className="flex cursor-pointer items-center gap-3 border border-amber-300 bg-amber-50/50 px-4 py-3 transition-colors hover:border-amber-400 focus-within:border-amber-600 focus-within:ring-1 focus-within:ring-amber-600/20">
+                    <input
+                      type="checkbox"
+                      checked={researchConfirmed}
+                      onChange={(e) => setResearchConfirmed(e.target.checked)}
+                      className="sr-only"
+                    />
                     <div
                       className={cn(
                         "flex size-4 shrink-0 items-center justify-center border transition-colors",
@@ -1184,6 +1302,7 @@ export default function CheckoutPage() {
             <OrderSummary
               cart={cart}
               shippingSelected={completedSteps.has(3)}
+              onCartUpdated={updateCartState}
             />
           </div>
         </div>
