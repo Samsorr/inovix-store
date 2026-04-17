@@ -16,6 +16,7 @@ const legalLinks = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Algemene Voorwaarden", href: "/voorwaarden" },
   { label: "Compliance", href: "/compliance" },
+  { label: "Bedrijfsgegevens", href: "/juridisch" },
 ]
 
 function FooterLinkGroup({

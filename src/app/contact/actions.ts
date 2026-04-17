@@ -58,9 +58,12 @@ export async function submitContactForm(
     }
   }
 
+  const fromAddress =
+    process.env.RESEND_FROM_EMAIL ?? "Inovix <noreply@inovix-peptides.com>"
+
   try {
     await resend.emails.send({
-      from: "Inovix Contact <noreply@inovix.eu>",
+      from: fromAddress,
       to: contactEmail,
       replyTo: email,
       subject: `[Contact] ${subject}`,

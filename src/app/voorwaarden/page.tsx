@@ -37,8 +37,22 @@ export default function VoorwaardenPage() {
           </h2>
           <p className="mt-3 text-muted-foreground">
             Deze voorwaarden zijn van toepassing op alle overeenkomsten tussen
-            Inovix en de klant. Alle producten worden uitsluitend geleverd voor
-            wetenschappelijk laboratoriumonderzoek.
+            Inovix en de klant. Alle producten worden uitsluitend geleverd
+            voor wetenschappelijk laboratoriumonderzoek en zijn niet bestemd
+            voor menselijke of veterinaire consumptie.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Bestelproces
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Lorem ipsum dolor sit amet. Een overeenkomst komt tot stand nadat
+            Inovix de bestelling schriftelijk of per e-mail heeft bevestigd.
+            Inovix behoudt zich het recht voor bestellingen zonder opgave van
+            redenen te weigeren, met name bij vermoeden van oneigenlijk
+            gebruik.
           </p>
         </section>
 
@@ -47,9 +61,10 @@ export default function VoorwaardenPage() {
             Prijzen en betaling
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Alle prijzen zijn exclusief btw, tenzij anders vermeld. Betaling
-            vindt plaats via Viva Wallet volgens de bij het bestelproces
-            getoonde opties.
+            Alle prijzen zijn in euro en inclusief de wettelijk verschuldigde
+            btw, tenzij anders vermeld. Betaling vindt plaats via Viva Wallet
+            volgens de bij het bestelproces getoonde opties. Bij niet-tijdige
+            betaling is de klant van rechtswege in verzuim.
           </p>
         </section>
 
@@ -59,7 +74,20 @@ export default function VoorwaardenPage() {
           </h2>
           <p className="mt-3 text-muted-foreground">
             Bestellingen worden verzonden via een temperatuurgecontroleerde
-            koelketen. Levering vindt plaats binnen de EU.
+            koelketen. Levering vindt plaats binnen de Europese Unie. De
+            opgegeven levertermijnen zijn indicatief; overschrijding geeft
+            geen recht op schadevergoeding of ontbinding.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Eigendomsvoorbehoud
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Lorem ipsum. Alle geleverde producten blijven eigendom van Inovix
+            totdat de klant de volledige koopsom, inclusief eventuele
+            bijkomende kosten, heeft voldaan.
           </p>
         </section>
 
@@ -72,20 +100,84 @@ export default function VoorwaardenPage() {
             gezondheidsbeschermings-overwegingen niet geschikt zijn om terug te
             sturen, geldt het wettelijk herroepingsrecht niet zodra de
             verzegeling is verbroken. Voor overige producten geldt een
-            bedenktijd van 14 dagen.
+            bedenktijd van veertien dagen na ontvangst.
           </p>
         </section>
 
-        <section className="border-l-2 border-mauve-400 bg-mauve-50 px-5 py-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-mauve-500">
-            In opbouw
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Garantie en conformiteit
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Lorem ipsum dolor sit amet. Inovix staat in voor de zuiverheid en
+            samenstelling zoals vermeld in het Certificate of Analysis dat
+            bij elke batch wordt geleverd. Klachten dienen binnen zeven dagen
+            na ontvangst schriftelijk te worden gemeld.
           </p>
-          <p className="mt-2 text-sm text-mauve-500">
-            De definitieve algemene voorwaarden worden door onze juridische
-            adviseur opgesteld en zijn beschikbaar vóór de officiële lancering.
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Aansprakelijkheid
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Lorem ipsum. De aansprakelijkheid van Inovix is beperkt tot het
+            factuurbedrag van de betreffende bestelling. Inovix is niet
+            aansprakelijk voor schade die voortvloeit uit oneigenlijk gebruik
+            van de producten of gebruik buiten de beoogde onderzoekscontext.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Overmacht
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            In geval van overmacht is Inovix gerechtigd de uitvoering van de
+            overeenkomst op te schorten. Onder overmacht wordt onder meer
+            verstaan: leveranciersuitval, transportstoringen, pandemieën en
+            overheidsmaatregelen.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Intellectuele eigendom
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Alle inhoud, waaronder teksten, afbeeldingen, productnamen en
+            analysecertificaten, is eigendom van Inovix. Verveelvoudiging
+            zonder voorafgaande schriftelijke toestemming is niet toegestaan.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Toepasselijk recht
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Op alle overeenkomsten is Nederlands recht van toepassing.
+            Geschillen worden voorgelegd aan de bevoegde rechter in het
+            arrondissement waar Inovix is gevestigd, tenzij dwingend recht
+            anders voorschrijft.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Wijzigingen
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Inovix is gerechtigd deze voorwaarden te wijzigen. De meest
+            actuele versie is te allen tijde beschikbaar op deze pagina.
           </p>
         </section>
       </div>
+
+      <p className="mt-12 text-xs text-navy-500/50">
+        Laatst bijgewerkt: [datum]. De definitieve algemene voorwaarden worden
+        door onze juridische adviseur afgerond vóór de officiële lancering.
+      </p>
     </div>
   )
 }

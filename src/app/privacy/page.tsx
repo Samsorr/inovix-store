@@ -37,8 +37,8 @@ export default function PrivacyPage() {
             Verwerkingsverantwoordelijke
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Inovix | [Bedrijfsnaam] | [Adres] | [KvK-nummer] | [BTW-nummer] |
-            privacy@inovix.eu
+            Inovix | [Bedrijfsnaam B.V.] | [Straatnaam 00, 0000 AA Plaats] |
+            KvK: [00000000] | BTW: NL[000000000]B01 | privacy@inovix.eu.
           </p>
         </section>
 
@@ -49,7 +49,9 @@ export default function PrivacyPage() {
           <p className="mt-3 text-muted-foreground">
             Bij een bestelling, accountregistratie of contactaanvraag
             verwerken wij onder andere: naam, e-mailadres, afleveradres,
-            factuuradres, betaalgegevens en bestelgeschiedenis.
+            factuuradres, betaalgegevens (afgehandeld door onze
+            betaaldienstverlener), bestelgeschiedenis, IP-adres en
+            apparaatgegevens voor fraudepreventie.
           </p>
         </section>
 
@@ -59,8 +61,83 @@ export default function PrivacyPage() {
           </h2>
           <p className="mt-3 text-muted-foreground">
             Uw gegevens worden uitsluitend gebruikt voor het verwerken van
-            bestellingen, klantcommunicatie, fraudepreventie en het voldoen aan
-            wettelijke verplichtingen.
+            bestellingen, klantcommunicatie, fraudepreventie, boekhoudkundige
+            verplichtingen en het voldoen aan wettelijke verplichtingen.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Rechtsgrondslag
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Lorem ipsum dolor sit amet. De verwerking is gebaseerd op: (a) de
+            uitvoering van de overeenkomst wanneer u een bestelling plaatst;
+            (b) een wettelijke verplichting voor boekhouding en fiscale
+            rapportage; (c) uw toestemming voor marketingcommunicatie en
+            optionele cookies; (d) ons gerechtvaardigd belang bij
+            fraudepreventie en verbetering van onze dienstverlening.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Bewaartermijnen
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Lorem ipsum. Bestelgegevens worden zeven jaar bewaard conform de
+            fiscale bewaarplicht. Accountgegevens worden bewaard zolang uw
+            account actief is en tot twaalf maanden na de laatste activiteit.
+            Marketingtoestemmingen worden bewaard tot intrekking.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Delen met derden
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Wij delen uw gegevens uitsluitend met verwerkers die noodzakelijk
+            zijn voor onze dienstverlening: betaaldienstverlener, vervoerders,
+            e-mailprovider, hostingdienst en boekhouder. Met elke verwerker is
+            een verwerkersovereenkomst gesloten. Wij verkopen uw gegevens
+            nooit aan derden.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Cookies
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Inovix gebruikt noodzakelijke cookies voor de werking van de
+            website en optionele cookies voor functionaliteit, analyse en
+            marketing. U kunt uw cookievoorkeuren op elk moment aanpassen via
+            de cookiebanner onderaan de pagina.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Doorgifte buiten de EU
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Lorem ipsum. Indien wij gegevens doorgeven aan verwerkers buiten
+            de Europese Economische Ruimte, doen wij dat uitsluitend op basis
+            van door de Europese Commissie goedgekeurde
+            standaardcontractbepalingen of een adequaatheidsbesluit.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Beveiliging
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Wij nemen passende technische en organisatorische maatregelen om
+            uw gegevens te beschermen tegen verlies, misbruik en ongeautoriseerde
+            toegang, waaronder TLS-versleuteling, toegangscontrole en
+            periodieke beveiligingsaudits.
           </p>
         </section>
 
@@ -70,21 +147,48 @@ export default function PrivacyPage() {
           </h2>
           <p className="mt-3 text-muted-foreground">
             U heeft recht op inzage, rectificatie, verwijdering, beperking,
-            overdraagbaarheid en bezwaar. Neem contact op via privacy@inovix.eu.
+            overdraagbaarheid en bezwaar. Ook kunt u een eerder verleende
+            toestemming op elk moment intrekken. Verzoeken kunt u indienen via
+            privacy@inovix.eu. Wij reageren binnen één maand.
           </p>
         </section>
 
-        <section className="border-l-2 border-mauve-400 bg-mauve-50 px-5 py-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-mauve-500">
-            In opbouw
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Klacht indienen
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Bent u het niet eens met de wijze waarop wij uw gegevens verwerken?
+            Dan heeft u het recht een klacht in te dienen bij de Autoriteit
+            Persoonsgegevens via{" "}
+            <a
+              href="https://autoriteitpersoonsgegevens.nl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-teal-400 underline-offset-2 hover:underline"
+            >
+              autoriteitpersoonsgegevens.nl
+            </a>
+            .
           </p>
-          <p className="mt-2 text-sm text-mauve-500">
-            Deze privacyverklaring wordt momenteel door onze juridische adviseur
-            opgesteld. De definitieve versie is beschikbaar vóór de officiële
-            lancering.
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
+            Wijzigingen
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Deze privacyverklaring kan van tijd tot tijd worden aangepast. De
+            meest actuele versie is te allen tijde beschikbaar op deze pagina.
+            Bij materiële wijzigingen informeren wij u vooraf.
           </p>
         </section>
       </div>
+
+      <p className="mt-12 text-xs text-navy-500/50">
+        Laatst bijgewerkt: [datum]. Dit document wordt door onze juridische
+        adviseur afgerond vóór de officiële lancering.
+      </p>
     </div>
   )
 }
