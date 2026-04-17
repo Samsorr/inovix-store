@@ -254,14 +254,14 @@ function OrderSummary({
                 : "Wordt berekend"}
             </span>
           </div>
-          {(cart.tax_total ?? 0) > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">BTW</span>
-              <span className="tabular-nums text-navy-500">
-                {formatPrice(cart.tax_total ?? 0)}
-              </span>
-            </div>
-          )}
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">
+              BTW {(cart.tax_total ?? 0) > 0 ? "" : "(0%)"}
+            </span>
+            <span className="tabular-nums text-navy-500">
+              {formatPrice(cart.tax_total ?? 0)}
+            </span>
+          </div>
         </div>
 
         <div className="mt-4 flex items-baseline justify-between border-t border-border pt-4">
@@ -295,6 +295,22 @@ const VIVA_ERROR_MESSAGES: Record<string, string> = {
     "De betaling werd niet geautoriseerd. Probeer het opnieuw met een andere betaalmethode.",
   error:
     "Er ging iets mis bij het afronden van uw bestelling. Probeer het opnieuw.",
+  declined:
+    "Uw bank heeft de betaling geweigerd. Probeer een andere kaart of neem contact op met uw bank.",
+  insufficient_funds:
+    "Onvoldoende saldo op uw kaart. Probeer een andere betaalmethode.",
+  invalid_card:
+    "De kaartgegevens zijn ongeldig. Controleer uw kaartnummer, vervaldatum en CVV.",
+  lost_card:
+    "Deze kaart is als verloren of gestolen gemeld. Gebruik een andere kaart.",
+  stolen_card:
+    "Deze kaart is als verloren of gestolen gemeld. Gebruik een andere kaart.",
+  expired_card:
+    "Deze kaart is verlopen. Gebruik een andere kaart.",
+  sca_failed:
+    "De beveiligingsverificatie (3D Secure) is niet voltooid. Probeer het opnieuw en bevestig de betaling in uw bank-app.",
+  timeout:
+    "De betaling is verlopen. Start de bestelling opnieuw.",
 }
 
 // Defense-in-depth: only redirect to known Viva Smart Checkout hosts. The URL
@@ -357,6 +373,11 @@ export default function CheckoutPage() {
   // Run the logged-in auto-advance at most once per mount so going back
   // via "Wijzigen" doesn't kick the user forward again.
   const autoAdvancedRef = useRef(false)
+
+  // Synchronous guard against double-submitting Place Order: React state
+  // updates are asynchronous, so a fast double-click can fire the handler
+  // twice before `isProcessing` re-renders. This ref blocks the second call.
+  const placingOrderRef = useRef(false)
 
   // Close cart sheet on mount
   useEffect(() => {
@@ -714,6 +735,7 @@ export default function CheckoutPage() {
 
   async function handlePlaceOrder() {
     if (!cart) return
+    if (placingOrderRef.current) return
     if (!selectedPayment) {
       setGlobalError("Selecteer een betaalmethode.")
       return
@@ -725,6 +747,7 @@ export default function CheckoutPage() {
       return
     }
 
+    placingOrderRef.current = true
     setIsProcessing(true)
     setGlobalError("")
 
@@ -741,6 +764,7 @@ export default function CheckoutPage() {
           "Kon de Viva-betaling niet starten. Probeer het opnieuw."
         )
         setIsProcessing(false)
+        placingOrderRef.current = false
         return
       }
 
@@ -815,6 +839,7 @@ export default function CheckoutPage() {
       )
     } finally {
       setIsProcessing(false)
+      placingOrderRef.current = false
     }
   }
 
@@ -958,6 +983,9 @@ export default function CheckoutPage() {
                   }}
                   error={emailError}
                   autoFocus
+                  autoComplete="email"
+                  inputMode="email"
+                  name="email"
                 />
                 <div className="mt-5">
                   <Button
@@ -998,6 +1026,8 @@ export default function CheckoutPage() {
                       }
                       error={addressErrors.firstName}
                       autoFocus
+                      autoComplete="given-name"
+                      name="given-name"
                     />
                     <Input
                       label="Achternaam"
@@ -1007,6 +1037,8 @@ export default function CheckoutPage() {
                         updateAddress("lastName", e.target.value)
                       }
                       error={addressErrors.lastName}
+                      autoComplete="family-name"
+                      name="family-name"
                     />
                   </div>
 
@@ -1015,6 +1047,8 @@ export default function CheckoutPage() {
                     placeholder="Uw laboratorium of bedrijf"
                     value={address.company}
                     onChange={(e) => updateAddress("company", e.target.value)}
+                    autoComplete="organization"
+                    name="organization"
                   />
 
                   <Input
@@ -1023,6 +1057,8 @@ export default function CheckoutPage() {
                     value={address.address1}
                     onChange={(e) => updateAddress("address1", e.target.value)}
                     error={addressErrors.address1}
+                    autoComplete="street-address"
+                    name="street-address"
                   />
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -1034,6 +1070,9 @@ export default function CheckoutPage() {
                         updateAddress("postalCode", e.target.value)
                       }
                       error={addressErrors.postalCode}
+                      autoComplete="postal-code"
+                      inputMode="text"
+                      name="postal-code"
                     />
                     <Input
                       label="Stad"
@@ -1041,6 +1080,8 @@ export default function CheckoutPage() {
                       value={address.city}
                       onChange={(e) => updateAddress("city", e.target.value)}
                       error={addressErrors.city}
+                      autoComplete="address-level2"
+                      name="address-level2"
                     />
                   </div>
 
@@ -1057,6 +1098,8 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         updateAddress("countryCode", e.target.value)
                       }
+                      autoComplete="country"
+                      name="country"
                       className="h-11 w-full border border-border bg-transparent px-3 py-2.5 text-base transition-colors outline-none focus:border-navy-500 focus:ring-1 focus:ring-navy-500/20 md:text-sm"
                     >
                       {EU_COUNTRIES.map((c) => (
@@ -1073,6 +1116,9 @@ export default function CheckoutPage() {
                     placeholder="+31 6 12345678"
                     value={address.phone}
                     onChange={(e) => updateAddress("phone", e.target.value)}
+                    autoComplete="tel"
+                    inputMode="tel"
+                    name="tel"
                   />
                 </div>
 

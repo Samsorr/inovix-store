@@ -7,6 +7,31 @@ import { Loader2 } from "lucide-react"
 import medusa from "@/lib/medusa"
 import { useCart } from "@/lib/context/cart-context"
 
+// Viva eventId codes documented at
+// https://developer.viva.com/integration-reference/response-codes/ — map a
+// handful of common ones to storefront query reasons so we show a specific
+// Dutch message rather than the generic "cancelled".
+const VIVA_EVENT_ID_MAP: Record<string, string> = {
+  // Issuer declines
+  "10005": "declined",
+  "10051": "insufficient_funds",
+  "10014": "invalid_card",
+  "10041": "lost_card",
+  "10043": "stolen_card",
+  "10054": "expired_card",
+  // 3DS failures
+  "2001": "sca_failed",
+  "2002": "sca_failed",
+  "2003": "sca_failed",
+  // Timeout / customer cancel
+  "10019": "timeout",
+}
+
+function mapVivaEventIdToReason(eventId: string | null): string | undefined {
+  if (!eventId) return undefined
+  return VIVA_EVENT_ID_MAP[eventId]
+}
+
 type PendingCart = {
   cartId: string
   email?: string
@@ -38,10 +63,12 @@ export default function VivaReturnPage() {
 
     const transactionId = searchParams.get("t")
     const orderCode = searchParams.get("s")
+    const eventId = searchParams.get("eventId")
 
     // No transaction id -> customer cancelled or navigated here directly.
     if (!transactionId) {
-      router.replace("/checkout?viva=cancelled")
+      const reason = mapVivaEventIdToReason(eventId) ?? "cancelled"
+      router.replace(`/checkout?viva=${reason}`)
       return
     }
 
