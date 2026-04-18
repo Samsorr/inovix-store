@@ -11,6 +11,10 @@ export function SavedAddressToast() {
   useEffect(() => {
     if (typeof window === "undefined") return
     if (sessionStorage.getItem(FLAG_KEY) === "1") {
+      // Reading sessionStorage is client-only and would cause hydration
+      // mismatch via useState initializer, so we accept the post-mount
+      // setState here. Effect runs once on mount; no cascading renders.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShow(true)
       sessionStorage.removeItem(FLAG_KEY)
       const t = setTimeout(() => setShow(false), 5000)
