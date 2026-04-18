@@ -17,67 +17,7 @@ import { cn } from "@/lib/utils"
 
 import { CheckoutStepper } from "./CheckoutStepper"
 import { PromoCodeInput } from "./PromoCodeInput"
-
-
-// ---------------------------------------------------------------------------
-// EU Countries
-// ---------------------------------------------------------------------------
-
-const EU_COUNTRIES = [
-  { code: "nl", name: "Nederland" },
-  { code: "be", name: "België" },
-  { code: "de", name: "Duitsland" },
-  { code: "fr", name: "Frankrijk" },
-  { code: "at", name: "Oostenrijk" },
-  { code: "it", name: "Italië" },
-  { code: "es", name: "Spanje" },
-  { code: "pt", name: "Portugal" },
-  { code: "ie", name: "Ierland" },
-  { code: "lu", name: "Luxemburg" },
-  { code: "fi", name: "Finland" },
-  { code: "se", name: "Zweden" },
-  { code: "dk", name: "Denemarken" },
-  { code: "pl", name: "Polen" },
-  { code: "cz", name: "Tsjechië" },
-  { code: "sk", name: "Slowakije" },
-  { code: "hu", name: "Hongarije" },
-  { code: "ro", name: "Roemenië" },
-  { code: "bg", name: "Bulgarije" },
-  { code: "hr", name: "Kroatië" },
-  { code: "si", name: "Slovenië" },
-  { code: "ee", name: "Estland" },
-  { code: "lv", name: "Letland" },
-  { code: "lt", name: "Litouwen" },
-  { code: "mt", name: "Malta" },
-  { code: "cy", name: "Cyprus" },
-  { code: "gr", name: "Griekenland" },
-]
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface AddressForm {
-  firstName: string
-  lastName: string
-  company: string
-  address1: string
-  postalCode: string
-  city: string
-  countryCode: string
-  phone: string
-}
-
-const INITIAL_ADDRESS: AddressForm = {
-  firstName: "",
-  lastName: "",
-  company: "",
-  address1: "",
-  postalCode: "",
-  city: "",
-  countryCode: "nl",
-  phone: "",
-}
+import { AddressForm, EMPTY_ADDRESS, type AddressFormValue } from "@/components/checkout/AddressForm"
 
 // ---------------------------------------------------------------------------
 // Step Section — clean, editorial accordion
@@ -346,9 +286,9 @@ export default function CheckoutPage() {
   const [emailError, setEmailError] = useState("")
 
   // Step 2: Address
-  const [address, setAddress] = useState<AddressForm>(INITIAL_ADDRESS)
+  const [address, setAddress] = useState<AddressFormValue>(EMPTY_ADDRESS)
   const [addressErrors, setAddressErrors] = useState<
-    Partial<Record<keyof AddressForm, string>>
+    Partial<Record<keyof AddressFormValue, string>>
   >({})
 
   // Step 3: Shipping
@@ -458,7 +398,7 @@ export default function CheckoutPage() {
           return
         }
 
-        const nextAddress: AddressForm = {
+        const nextAddress: AddressFormValue = {
           firstName: addr.first_name ?? "",
           lastName: addr.last_name ?? "",
           company: addr.company ?? "",
@@ -527,20 +467,6 @@ export default function CheckoutPage() {
     setActiveStep(step)
   }, [])
 
-  function updateAddress<K extends keyof AddressForm>(
-    field: K,
-    value: AddressForm[K]
-  ) {
-    setAddress((prev) => ({ ...prev, [field]: value }))
-    if (addressErrors[field]) {
-      setAddressErrors((prev) => {
-        const next = { ...prev }
-        delete next[field]
-        return next
-      })
-    }
-  }
-
   // -----------------------------------------------------------------------
   // Step 1: Email
   // -----------------------------------------------------------------------
@@ -581,7 +507,7 @@ export default function CheckoutPage() {
   async function handleAddressSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!cart) return
-    const errors: Partial<Record<keyof AddressForm, string>> = {}
+    const errors: Partial<Record<keyof AddressFormValue, string>> = {}
 
     if (!address.firstName.trim()) errors.firstName = "Voornaam is verplicht"
     if (!address.lastName.trim()) errors.lastName = "Achternaam is verplicht"
@@ -1015,112 +941,16 @@ export default function CheckoutPage() {
               onEdit={() => editStep(2)}
             >
               <form onSubmit={handleAddressSubmit}>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Input
-                      label="Voornaam"
-                      placeholder="Jan"
-                      value={address.firstName}
-                      onChange={(e) =>
-                        updateAddress("firstName", e.target.value)
-                      }
-                      error={addressErrors.firstName}
-                      autoFocus
-                      autoComplete="given-name"
-                      name="given-name"
-                    />
-                    <Input
-                      label="Achternaam"
-                      placeholder="de Vries"
-                      value={address.lastName}
-                      onChange={(e) =>
-                        updateAddress("lastName", e.target.value)
-                      }
-                      error={addressErrors.lastName}
-                      autoComplete="family-name"
-                      name="family-name"
-                    />
-                  </div>
-
-                  <Input
-                    label="Bedrijfsnaam (optioneel)"
-                    placeholder="Uw laboratorium of bedrijf"
-                    value={address.company}
-                    onChange={(e) => updateAddress("company", e.target.value)}
-                    autoComplete="organization"
-                    name="organization"
-                  />
-
-                  <Input
-                    label="Adres"
-                    placeholder="Straatnaam 123"
-                    value={address.address1}
-                    onChange={(e) => updateAddress("address1", e.target.value)}
-                    error={addressErrors.address1}
-                    autoComplete="street-address"
-                    name="street-address"
-                  />
-
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Input
-                      label="Postcode"
-                      placeholder="1234 AB"
-                      value={address.postalCode}
-                      onChange={(e) =>
-                        updateAddress("postalCode", e.target.value)
-                      }
-                      error={addressErrors.postalCode}
-                      autoComplete="postal-code"
-                      inputMode="text"
-                      name="postal-code"
-                    />
-                    <Input
-                      label="Stad"
-                      placeholder="Amsterdam"
-                      value={address.city}
-                      onChange={(e) => updateAddress("city", e.target.value)}
-                      error={addressErrors.city}
-                      autoComplete="address-level2"
-                      name="address-level2"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label
-                      htmlFor="country"
-                      className="text-sm font-medium text-navy-500"
-                    >
-                      Land
-                    </label>
-                    <select
-                      id="country"
-                      value={address.countryCode}
-                      onChange={(e) =>
-                        updateAddress("countryCode", e.target.value)
-                      }
-                      autoComplete="country"
-                      name="country"
-                      className="h-11 w-full border border-border bg-transparent px-3 py-2.5 text-base transition-colors outline-none focus:border-navy-500 focus:ring-1 focus:ring-navy-500/20 md:text-sm"
-                    >
-                      {EU_COUNTRIES.map((c) => (
-                        <option key={c.code} value={c.code}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <Input
-                    type="tel"
-                    label="Telefoonnummer (optioneel)"
-                    placeholder="+31 6 12345678"
-                    value={address.phone}
-                    onChange={(e) => updateAddress("phone", e.target.value)}
-                    autoComplete="tel"
-                    inputMode="tel"
-                    name="tel"
-                  />
-                </div>
+                <AddressForm
+                  value={address}
+                  errors={addressErrors}
+                  onChange={(next) => {
+                    setAddress(next)
+                    if (Object.keys(addressErrors).length > 0) setAddressErrors({})
+                  }}
+                  autoFocusFirstField
+                  autocompleteSection="shipping"
+                />
 
                 <div className="mt-5">
                   <Button
