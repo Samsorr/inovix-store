@@ -21,6 +21,8 @@ import { PromoCodeInput } from "./PromoCodeInput"
 import { AddressForm, EMPTY_ADDRESS, type AddressFormValue } from "@/components/checkout/AddressForm"
 import { SavedAddressPicker, type SavedAddress } from "@/components/checkout/SavedAddressPicker"
 import { ShippingOptionCard, type ShippingOptionData } from "@/components/checkout/ShippingOptionCard"
+import { StickyOrderSummary } from "@/components/checkout/StickyOrderSummary"
+import { TrustBlock } from "@/components/checkout/TrustBlock"
 
 // ---------------------------------------------------------------------------
 // Step Section — clean, editorial accordion
@@ -307,6 +309,7 @@ export default function CheckoutPage() {
   const [shippingOptions, setShippingOptions] = useState<ShippingOptionData[]>([])
   const [selectedShipping, setSelectedShipping] = useState("")
   const [loadingShipping, setLoadingShipping] = useState(false)
+  const [orderNotes, setOrderNotes] = useState("")
 
   // Step 4: Payment
   const [paymentProviders, setPaymentProviders] = useState<
@@ -670,6 +673,11 @@ export default function CheckoutPage() {
         { option_id: optionId }
       )
       updateCartState(updated)
+      if (orderNotes.trim()) {
+        await medusa.store.cart.update(cart.id, {
+          metadata: { ...((cart.metadata as Record<string, unknown>) ?? {}), delivery_notes: orderNotes.trim() },
+        })
+      }
       completeStep(3)
       fetchPaymentProviders()
     } catch {
@@ -755,6 +763,19 @@ export default function CheckoutPage() {
     placingOrderRef.current = true
     setIsProcessing(true)
     setGlobalError("")
+
+    // Persist any latest order notes that may have been typed after shipping was picked
+    if (orderNotes.trim() && cart) {
+      try {
+        const { cart: withNotes } = await medusa.store.cart.update(cart.id, {
+          metadata: { ...((cart.metadata as Record<string, unknown> | null) ?? {}), delivery_notes: orderNotes.trim() },
+        })
+        updateCartState(withNotes)
+      } catch (err) {
+        console.error("Failed to persist order notes:", err)
+        // Don't block order placement on notes failure
+      }
+    }
 
     // Viva Wallet: redirect to Smart Checkout instead of completing locally.
     if (selectedPayment === "pp_viva-wallet_viva") {
@@ -937,6 +958,14 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <StickyOrderSummary total={cart.total ?? 0} itemCount={cartCount}>
+        <OrderSummary
+          cart={cart}
+          shippingSelected={completedSteps.has(3)}
+          onCartUpdated={updateCartState}
+        />
+      </StickyOrderSummary>
+
       <div className="lg:grid lg:grid-cols-12 lg:gap-16">
         {/* Left column — Form */}
         <div className="lg:col-span-7">
@@ -1208,17 +1237,32 @@ export default function CheckoutPage() {
                   Geen verzendopties beschikbaar voor dit adres.
                 </p>
               ) : (
-                <div className="space-y-2" role="radiogroup" aria-label="Verzendmethode">
-                  {shippingOptions.map((option) => (
-                    <ShippingOptionCard
-                      key={option.id}
-                      option={option}
-                      selected={selectedShipping === option.id}
-                      disabled={isProcessing}
-                      onSelect={selectShippingOption}
+                <>
+                  <div className="space-y-2" role="radiogroup" aria-label="Verzendmethode">
+                    {shippingOptions.map((option) => (
+                      <ShippingOptionCard
+                        key={option.id}
+                        option={option}
+                        selected={selectedShipping === option.id}
+                        disabled={isProcessing}
+                        onSelect={selectShippingOption}
+                      />
+                    ))}
+                  </div>
+                  <div className="mt-6">
+                    <label htmlFor="order-notes" className="mb-1.5 block text-sm font-medium text-navy-500">
+                      Opmerkingen voor bezorger (optioneel)
+                    </label>
+                    <textarea
+                      id="order-notes"
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      rows={3}
+                      className="w-full border border-border bg-transparent px-3 py-2.5 text-sm transition-colors outline-none focus:border-navy-500 focus:ring-1 focus:ring-navy-500/20"
+                      placeholder="Bijv. afgeven bij buren op nummer 12"
                     />
-                  ))}
-                </div>
+                  </div>
+                </>
               )}
             </StepSection>
 
@@ -1331,6 +1375,8 @@ export default function CheckoutPage() {
                       voor menselijke of veterinaire consumptie.
                     </span>
                   </label>
+
+                  <TrustBlock />
 
                   <Button
                     variant="primary"

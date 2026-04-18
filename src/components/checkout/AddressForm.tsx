@@ -120,16 +120,21 @@ export function AddressForm({
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Input
-          label="Postcode"
-          placeholder="1234 AB"
-          value={value.postalCode}
-          onChange={(e) => update("postalCode", e.target.value)}
-          error={errors.postalCode}
-          autoComplete={ac("postal-code")}
-          inputMode="text"
-          name="postal-code"
-        />
+        <div>
+          <Input
+            label="Postcode"
+            placeholder="1234 AB"
+            value={value.postalCode}
+            onChange={(e) => update("postalCode", e.target.value)}
+            error={errors.postalCode}
+            autoComplete={ac("postal-code")}
+            inputMode="text"
+            name="postal-code"
+          />
+          {value.countryCode === "nl" && value.postalCode && (
+            <p className="mt-1 text-[11px] text-muted-foreground">Format: 1234 AB</p>
+          )}
+        </div>
         <Input
           label="Stad"
           placeholder="Amsterdam"
@@ -164,7 +169,7 @@ export function AddressForm({
       <Input
         type="tel"
         label="Telefoonnummer (optioneel)"
-        placeholder="+31 6 12345678"
+        placeholder={value.countryCode === "be" ? "+32 4 7012 3456" : "+31 6 12345678"}
         value={value.phone}
         onChange={(e) => update("phone", e.target.value)}
         autoComplete={ac("tel")}

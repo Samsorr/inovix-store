@@ -36,6 +36,23 @@ export default function RegistratiePage() {
     }
   }, [isLoading, isAuthenticated, redirectTo, router])
 
+  useEffect(() => {
+    if (searchParams.get("prefill") !== "true") return
+    if (typeof window === "undefined") return
+    const raw = sessionStorage.getItem("inovix_signup_prefill")
+    if (!raw) return
+    try {
+      const data = JSON.parse(raw)
+      if (data.email) setEmail(data.email)
+      if (data.first_name) setFirstName(data.first_name)
+      if (data.last_name) setLastName(data.last_name)
+      sessionStorage.removeItem("inovix_signup_prefill")
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
