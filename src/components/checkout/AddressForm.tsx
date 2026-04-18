@@ -3,6 +3,8 @@
 import { Input } from "@/components/ui/input"
 import { EU_COUNTRIES } from "@/lib/countries"
 import { cn } from "@/lib/utils"
+import { PostcodeLookup } from "@/components/checkout/PostcodeLookup"
+import type { SupportedCountry } from "@/lib/postcode"
 
 export interface AddressFormValue {
   firstName: string
@@ -51,8 +53,31 @@ export function AddressForm({
 
   const ac = (token: string) => (autocompleteSection ? `${autocompleteSection} ${token}` : token)
 
+  const supportsLookup = value.countryCode === "nl" || value.countryCode === "be"
+
   return (
     <div className={cn("space-y-4", className)}>
+      {supportsLookup && (
+        <div className="border border-border bg-surface-secondary/40 p-4">
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+            Snelle invoer
+          </p>
+          <PostcodeLookup
+            country={value.countryCode as SupportedCountry}
+            onResolved={({ address1, city, postcode }) => {
+              onChange({
+                ...value,
+                address1,
+                city,
+                postalCode: postcode,
+              })
+            }}
+          />
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Velden hieronder worden automatisch ingevuld. U kunt ze altijd aanpassen.
+          </p>
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input
           label="Voornaam"

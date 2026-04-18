@@ -16,7 +16,7 @@ describe("AddressForm", () => {
     expect(screen.getByLabelText(/Voornaam/)).toBeInTheDocument()
     expect(screen.getByLabelText(/Achternaam/)).toBeInTheDocument()
     expect(screen.getByLabelText(/Adres/)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Postcode/)).toBeInTheDocument()
+    expect(screen.getAllByLabelText(/Postcode/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByLabelText(/Stad/)).toBeInTheDocument()
   })
 
