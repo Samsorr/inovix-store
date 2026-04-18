@@ -20,6 +20,7 @@ import { CheckoutStepper } from "./CheckoutStepper"
 import { PromoCodeInput } from "./PromoCodeInput"
 import { AddressForm, EMPTY_ADDRESS, type AddressFormValue } from "@/components/checkout/AddressForm"
 import { SavedAddressPicker, type SavedAddress } from "@/components/checkout/SavedAddressPicker"
+import { ShippingOptionCard, type ShippingOptionData } from "@/components/checkout/ShippingOptionCard"
 
 // ---------------------------------------------------------------------------
 // Step Section — clean, editorial accordion
@@ -303,9 +304,7 @@ export default function CheckoutPage() {
   const [billingSelectedId, setBillingSelectedId] = useState<string | null>(null)
 
   // Step 3: Shipping
-  const [shippingOptions, setShippingOptions] = useState<
-    Array<{ id: string; name: string; amount: number; price_type: string }>
-  >([])
+  const [shippingOptions, setShippingOptions] = useState<ShippingOptionData[]>([])
   const [selectedShipping, setSelectedShipping] = useState("")
   const [loadingShipping, setLoadingShipping] = useState(false)
 
@@ -635,12 +634,18 @@ export default function CheckoutPage() {
           cart_id: cart.id,
         })
 
-      const options = (shipping_options ?? []).map((opt) => ({
-        id: opt.id,
-        name: opt.name ?? "Standaard verzending",
-        amount: opt.amount ?? 0,
-        price_type: opt.price_type ?? "flat",
-      }))
+      const options: ShippingOptionData[] = (shipping_options ?? []).map((opt) => {
+        const meta = ((opt as unknown as { metadata?: Record<string, unknown> }).metadata ?? {})
+        return {
+          id: opt.id,
+          name: opt.name ?? "Standaard verzending",
+          amount: opt.amount ?? 0,
+          carrier: typeof meta.carrier === "string" ? meta.carrier : undefined,
+          deliveryEstimate: typeof meta.delivery_estimate === "string" ? meta.delivery_estimate : undefined,
+          tracked: meta.tracked === true,
+          insured: meta.insured === true,
+        }
+      })
 
       setShippingOptions(options)
 
@@ -1203,50 +1208,15 @@ export default function CheckoutPage() {
                   Geen verzendopties beschikbaar voor dit adres.
                 </p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2" role="radiogroup" aria-label="Verzendmethode">
                   {shippingOptions.map((option) => (
-                    <label
+                    <ShippingOptionCard
                       key={option.id}
-                      className={cn(
-                        "flex cursor-pointer items-center justify-between border px-4 py-3 transition-colors focus-within:border-navy-500 focus-within:ring-1 focus-within:ring-navy-500/20",
-                        selectedShipping === option.id
-                          ? "border-navy-500 bg-navy-500/[0.02]"
-                          : "border-border hover:border-navy-200",
-                        isProcessing && "pointer-events-none opacity-60"
-                      )}
-                    >
-                      <input
-                        type="radio"
-                        name="shipping_option"
-                        value={option.id}
-                        checked={selectedShipping === option.id}
-                        onChange={() => selectShippingOption(option.id)}
-                        disabled={isProcessing}
-                        className="sr-only"
-                      />
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={cn(
-                            "flex size-4 items-center justify-center border",
-                            selectedShipping === option.id
-                              ? "border-navy-500"
-                              : "border-border"
-                          )}
-                        >
-                          {selectedShipping === option.id && (
-                            <div className="size-2 bg-navy-500" />
-                          )}
-                        </div>
-                        <span className="text-sm text-navy-500">
-                          {option.name}
-                        </span>
-                      </div>
-                      <span className="text-sm tabular-nums text-navy-500">
-                        {option.amount
-                          ? formatPrice(option.amount)
-                          : "Gratis"}
-                      </span>
-                    </label>
+                      option={option}
+                      selected={selectedShipping === option.id}
+                      disabled={isProcessing}
+                      onSelect={selectShippingOption}
+                    />
                   ))}
                 </div>
               )}
