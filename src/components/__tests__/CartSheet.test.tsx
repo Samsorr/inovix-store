@@ -87,7 +87,7 @@ function cartItem(overrides: Record<string, unknown> = {}) {
     id: "li_1",
     title: "BPC-157",
     quantity: 2,
-    unit_price: 4999,
+    unit_price: 49.99,
     thumbnail: "/images/product-peptide.png",
     variant: { id: "var_5mg", title: "5mg" },
     ...overrides,
@@ -132,7 +132,7 @@ describe("CartSheet", () => {
 
   it("renders items when cart has items and isCartOpen is true", () => {
     const items = [cartItem(), cartItem({ id: "li_2", title: "TB-500" })]
-    setupCart({ items, cartTotal: 9998 })
+    setupCart({ items, cartTotal: 99.98 })
 
     render(<CartSheet />)
 
@@ -141,7 +141,7 @@ describe("CartSheet", () => {
   })
 
   it("shows item title and variant title", () => {
-    setupCart({ items: [cartItem()], cartTotal: 9998 })
+    setupCart({ items: [cartItem()], cartTotal: 99.98 })
 
     render(<CartSheet />)
 
@@ -150,7 +150,7 @@ describe("CartSheet", () => {
   })
 
   it("shows quantity for each item", () => {
-    setupCart({ items: [cartItem({ quantity: 3 })], cartTotal: 14997 })
+    setupCart({ items: [cartItem({ quantity: 3 })], cartTotal: 149.97 })
 
     render(<CartSheet />)
 
@@ -159,7 +159,7 @@ describe("CartSheet", () => {
 
   it("shows formatted price for each item", () => {
     // unit_price 4999 * quantity 2 = 9998 cents => formatPrice => "€ 99,98"
-    setupCart({ items: [cartItem()], cartTotal: 9998 })
+    setupCart({ items: [cartItem()], cartTotal: 99.98 })
 
     render(<CartSheet />)
 
@@ -171,7 +171,7 @@ describe("CartSheet", () => {
 
   it("remove button calls removeItem with correct line item ID", async () => {
     const user = userEvent.setup()
-    setupCart({ items: [cartItem({ id: "li_abc" })], cartTotal: 9998 })
+    setupCart({ items: [cartItem({ id: "li_abc" })], cartTotal: 99.98 })
 
     render(<CartSheet />)
 
@@ -183,7 +183,7 @@ describe("CartSheet", () => {
 
   it("increment button calls updateQuantity with quantity + 1", async () => {
     const user = userEvent.setup()
-    setupCart({ items: [cartItem({ id: "li_inc", quantity: 2 })], cartTotal: 9998 })
+    setupCart({ items: [cartItem({ id: "li_inc", quantity: 2 })], cartTotal: 99.98 })
 
     render(<CartSheet />)
 
@@ -195,7 +195,7 @@ describe("CartSheet", () => {
 
   it("decrement button calls updateQuantity with quantity - 1 when quantity > 1", async () => {
     const user = userEvent.setup()
-    setupCart({ items: [cartItem({ id: "li_dec", quantity: 3 })], cartTotal: 14997 })
+    setupCart({ items: [cartItem({ id: "li_dec", quantity: 3 })], cartTotal: 149.97 })
 
     render(<CartSheet />)
 
@@ -207,7 +207,7 @@ describe("CartSheet", () => {
 
   it("decrement button calls removeItem when quantity is 1", async () => {
     const user = userEvent.setup()
-    setupCart({ items: [cartItem({ id: "li_rem", quantity: 1 })], cartTotal: 4999 })
+    setupCart({ items: [cartItem({ id: "li_rem", quantity: 1 })], cartTotal: 49.99 })
 
     render(<CartSheet />)
 
@@ -229,7 +229,7 @@ describe("CartSheet", () => {
 
   it("shows subtotal in footer", () => {
     // cartTotal = 9998 cents => formatPrice => "€ 99,98"
-    setupCart({ items: [cartItem()], cartTotal: 9998 })
+    setupCart({ items: [cartItem()], cartTotal: 99.98 })
 
     render(<CartSheet />)
 
@@ -239,7 +239,7 @@ describe("CartSheet", () => {
   })
 
   it("has checkout link pointing to /checkout", () => {
-    setupCart({ items: [cartItem()], cartTotal: 9998 })
+    setupCart({ items: [cartItem()], cartTotal: 99.98 })
 
     render(<CartSheet />)
 
@@ -248,7 +248,7 @@ describe("CartSheet", () => {
   })
 
   it("shows research disclaimer", () => {
-    setupCart({ items: [cartItem()], cartTotal: 9998 })
+    setupCart({ items: [cartItem()], cartTotal: 99.98 })
 
     render(<CartSheet />)
 

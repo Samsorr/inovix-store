@@ -40,7 +40,7 @@ vi.mock("@/lib/medusa", async () => ({
 vi.mock("@/lib/price", () => ({
   formatPrice: (amount: number, currency = "EUR") =>
     new Intl.NumberFormat("nl-NL", { style: "currency", currency }).format(
-      amount / 100
+      amount
     ),
 }))
 

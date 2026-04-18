@@ -25,7 +25,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/price", () => ({
   formatPrice: (amount: number, currency = "EUR") =>
     new Intl.NumberFormat("nl-NL", { style: "currency", currency }).format(
-      amount / 100
+      amount
     ),
 }))
 

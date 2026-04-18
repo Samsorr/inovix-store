@@ -1,16 +1,17 @@
 /**
- * Format a Medusa price (stored in cents) to a display string.
+ * Format a Medusa v2 price (stored as decimal whole currency units) to a display string.
  */
-export function formatPrice(amountInCents: number, currency = "EUR"): string {
+export function formatPrice(amount: number, currency = "EUR"): string {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
     currency,
-  }).format(amountInCents / 100)
+  }).format(amount)
 }
 
 /**
- * Convert Medusa price (cents) to euros.
+ * Medusa v2 returns prices as decimal whole currency units, so this is a pass-through.
+ * Kept for call-site compatibility.
  */
-export function centsToEuros(amountInCents: number): number {
-  return amountInCents / 100
+export function centsToEuros(amount: number): number {
+  return amount
 }
