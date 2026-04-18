@@ -4,25 +4,25 @@ import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-  Check,
   Loader2,
   LogOut,
   MapPin,
   Package,
   Pencil,
   Plus,
-  Trash2,
   User,
   X,
 } from "lucide-react"
 
 import { useAuth } from "@/lib/context/auth-context"
 import medusa from "@/lib/medusa"
+import { AddressCard, type SavedAddress } from "@/components/account/AddressCard"
+import { EditAddressModal } from "@/components/account/EditAddressModal"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { formatPrice } from "@/lib/price"
-import { EU_COUNTRIES, countryName } from "@/lib/countries"
+import { EU_COUNTRIES } from "@/lib/countries"
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -107,6 +107,8 @@ export default function AccountPage() {
   })
   const [savingAddress, setSavingAddress] = useState(false)
   const [deletingAddress, setDeletingAddress] = useState<string | null>(null)
+  const [editingAddress, setEditingAddress] = useState<SavedAddress | null>(null)
+  const [busyAddressId, setBusyAddressId] = useState<string | null>(null)
 
   // ── Profile editing ──
   const [isEditingProfile, setIsEditingProfile] = useState(false)
@@ -485,44 +487,27 @@ export default function AccountPage() {
               {addresses.length > 0 && (
                 <div className="space-y-3">
                   {addresses.map((addr) => (
-                    <div
+                    <AddressCard
                       key={addr.id}
-                      className="flex items-start justify-between border border-border px-4 py-3"
-                    >
-                      <div className="text-sm">
-                        <p className="font-medium text-navy-500">
-                          {addr.first_name} {addr.last_name}
-                        </p>
-                        {addr.company && (
-                          <p className="text-muted-foreground">
-                            {addr.company}
-                          </p>
-                        )}
-                        <p className="text-muted-foreground">
-                          {addr.address_1}
-                        </p>
-                        <p className="text-muted-foreground">
-                          {addr.postal_code} {addr.city},{" "}
-                          {countryName(addr.country_code)}
-                        </p>
-                        {addr.phone && (
-                          <p className="text-muted-foreground">{addr.phone}</p>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteAddress(addr.id)}
-                        disabled={deletingAddress === addr.id}
-                        className="p-1 text-muted-foreground transition-colors hover:text-red-500"
-                        aria-label="Adres verwijderen"
-                      >
-                        {deletingAddress === addr.id ? (
-                          <Loader2 className="size-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="size-3.5" />
-                        )}
-                      </button>
-                    </div>
+                      address={addr as SavedAddress}
+                      busy={busyAddressId === addr.id || deletingAddress === addr.id}
+                      onEdit={() => setEditingAddress(addr as SavedAddress)}
+                      onDelete={() => handleDeleteAddress(addr.id)}
+                      onMakeDefault={async () => {
+                        setBusyAddressId(addr.id)
+                        try {
+                          await medusa.store.customer.updateAddress(addr.id, {
+                            is_default_shipping: true,
+                            is_default_billing: true,
+                          })
+                          fetchAddresses()
+                        } catch {
+                          setError("Kon standaard niet instellen. Probeer het opnieuw.")
+                        } finally {
+                          setBusyAddressId(null)
+                        }
+                      }}
+                    />
                   ))}
                 </div>
               )}
@@ -670,6 +655,17 @@ export default function AccountPage() {
           )}
         </Section>
       </div>
+
+      {editingAddress && (
+        <EditAddressModal
+          address={editingAddress}
+          onClose={() => setEditingAddress(null)}
+          onSaved={() => {
+            fetchAddresses()
+            setEditingAddress(null)
+          }}
+        />
+      )}
     </div>
   )
 }
