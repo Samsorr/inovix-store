@@ -14,70 +14,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { cn } from "@/lib/utils"
+import * as Sentry from "@sentry/nextjs"
 
 import { CheckoutStepper } from "./CheckoutStepper"
 import { PromoCodeInput } from "./PromoCodeInput"
-
-
-// ---------------------------------------------------------------------------
-// EU Countries
-// ---------------------------------------------------------------------------
-
-const EU_COUNTRIES = [
-  { code: "nl", name: "Nederland" },
-  { code: "be", name: "België" },
-  { code: "de", name: "Duitsland" },
-  { code: "fr", name: "Frankrijk" },
-  { code: "at", name: "Oostenrijk" },
-  { code: "it", name: "Italië" },
-  { code: "es", name: "Spanje" },
-  { code: "pt", name: "Portugal" },
-  { code: "ie", name: "Ierland" },
-  { code: "lu", name: "Luxemburg" },
-  { code: "fi", name: "Finland" },
-  { code: "se", name: "Zweden" },
-  { code: "dk", name: "Denemarken" },
-  { code: "pl", name: "Polen" },
-  { code: "cz", name: "Tsjechië" },
-  { code: "sk", name: "Slowakije" },
-  { code: "hu", name: "Hongarije" },
-  { code: "ro", name: "Roemenië" },
-  { code: "bg", name: "Bulgarije" },
-  { code: "hr", name: "Kroatië" },
-  { code: "si", name: "Slovenië" },
-  { code: "ee", name: "Estland" },
-  { code: "lv", name: "Letland" },
-  { code: "lt", name: "Litouwen" },
-  { code: "mt", name: "Malta" },
-  { code: "cy", name: "Cyprus" },
-  { code: "gr", name: "Griekenland" },
-]
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface AddressForm {
-  firstName: string
-  lastName: string
-  company: string
-  address1: string
-  postalCode: string
-  city: string
-  countryCode: string
-  phone: string
-}
-
-const INITIAL_ADDRESS: AddressForm = {
-  firstName: "",
-  lastName: "",
-  company: "",
-  address1: "",
-  postalCode: "",
-  city: "",
-  countryCode: "nl",
-  phone: "",
-}
+import { AddressForm, EMPTY_ADDRESS, type AddressFormValue } from "@/components/checkout/AddressForm"
+import { SavedAddressPicker, type SavedAddress } from "@/components/checkout/SavedAddressPicker"
+import { ShippingOptionCard, type ShippingOptionData } from "@/components/checkout/ShippingOptionCard"
+import { StickyOrderSummary } from "@/components/checkout/StickyOrderSummary"
+import { TrustBlock } from "@/components/checkout/TrustBlock"
 
 // ---------------------------------------------------------------------------
 // Step Section — clean, editorial accordion
@@ -346,17 +291,25 @@ export default function CheckoutPage() {
   const [emailError, setEmailError] = useState("")
 
   // Step 2: Address
-  const [address, setAddress] = useState<AddressForm>(INITIAL_ADDRESS)
+  const [address, setAddress] = useState<AddressFormValue>(EMPTY_ADDRESS)
   const [addressErrors, setAddressErrors] = useState<
-    Partial<Record<keyof AddressForm, string>>
+    Partial<Record<keyof AddressFormValue, string>>
   >({})
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(null)
+  const [saveAddressToAccount, setSaveAddressToAccount] = useState(true)
+
+  // Step 2: Billing address (optional separate)
+  const [useDifferentBilling, setUseDifferentBilling] = useState(false)
+  const [billingAddress, setBillingAddress] = useState<AddressFormValue>(EMPTY_ADDRESS)
+  const [billingErrors, setBillingErrors] = useState<Partial<Record<keyof AddressFormValue, string>>>({})
+  const [billingSelectedId, setBillingSelectedId] = useState<string | null>(null)
 
   // Step 3: Shipping
-  const [shippingOptions, setShippingOptions] = useState<
-    Array<{ id: string; name: string; amount: number; price_type: string }>
-  >([])
+  const [shippingOptions, setShippingOptions] = useState<ShippingOptionData[]>([])
   const [selectedShipping, setSelectedShipping] = useState("")
   const [loadingShipping, setLoadingShipping] = useState(false)
+  const [orderNotes, setOrderNotes] = useState("")
 
   // Step 4: Payment
   const [paymentProviders, setPaymentProviders] = useState<
@@ -453,12 +406,28 @@ export default function CheckoutPage() {
           addresses?.find((a) => a.is_default_shipping) ??
           addresses?.[0] ??
           undefined
-        if (cancelled || !addr) {
+        if (!cancelled) {
+          setSavedAddresses(addresses ?? [])
+          setSelectedSavedAddressId(addr?.id ?? null)
+        }
+        if (!addr) {
+          if (!cancelled) {
+            setAddress({
+              ...EMPTY_ADDRESS,
+              firstName: customer.first_name ?? "",
+              lastName: customer.last_name ?? "",
+              phone: customer.phone ?? "",
+            })
+            setActiveStep(2)
+          }
+          return
+        }
+        if (cancelled) {
           setActiveStep(2)
           return
         }
 
-        const nextAddress: AddressForm = {
+        const nextAddress: AddressFormValue = {
           firstName: addr.first_name ?? "",
           lastName: addr.last_name ?? "",
           company: addr.company ?? "",
@@ -527,20 +496,6 @@ export default function CheckoutPage() {
     setActiveStep(step)
   }, [])
 
-  function updateAddress<K extends keyof AddressForm>(
-    field: K,
-    value: AddressForm[K]
-  ) {
-    setAddress((prev) => ({ ...prev, [field]: value }))
-    if (addressErrors[field]) {
-      setAddressErrors((prev) => {
-        const next = { ...prev }
-        delete next[field]
-        return next
-      })
-    }
-  }
-
   // -----------------------------------------------------------------------
   // Step 1: Email
   // -----------------------------------------------------------------------
@@ -581,7 +536,7 @@ export default function CheckoutPage() {
   async function handleAddressSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!cart) return
-    const errors: Partial<Record<keyof AddressForm, string>> = {}
+    const errors: Partial<Record<keyof AddressFormValue, string>> = {}
 
     if (!address.firstName.trim()) errors.firstName = "Voornaam is verplicht"
     if (!address.lastName.trim()) errors.lastName = "Achternaam is verplicht"
@@ -592,6 +547,19 @@ export default function CheckoutPage() {
     if (Object.keys(errors).length > 0) {
       setAddressErrors(errors)
       return
+    }
+
+    if (useDifferentBilling) {
+      const bErrors: Partial<Record<keyof AddressFormValue, string>> = {}
+      if (!billingAddress.firstName.trim()) bErrors.firstName = "Voornaam is verplicht"
+      if (!billingAddress.lastName.trim()) bErrors.lastName = "Achternaam is verplicht"
+      if (!billingAddress.address1.trim()) bErrors.address1 = "Adres is verplicht"
+      if (!billingAddress.postalCode.trim()) bErrors.postalCode = "Postcode is verplicht"
+      if (!billingAddress.city.trim()) bErrors.city = "Stad is verplicht"
+      if (Object.keys(bErrors).length > 0) {
+        setBillingErrors(bErrors)
+        return
+      }
     }
 
     setIsProcessing(true)
@@ -606,11 +574,45 @@ export default function CheckoutPage() {
         country_code: address.countryCode,
         phone: address.phone.trim() || undefined,
       }
+
+      const billingAddr = useDifferentBilling
+        ? {
+            first_name: billingAddress.firstName.trim(),
+            last_name: billingAddress.lastName.trim(),
+            company: billingAddress.company.trim() || undefined,
+            address_1: billingAddress.address1.trim(),
+            postal_code: billingAddress.postalCode.trim(),
+            city: billingAddress.city.trim(),
+            country_code: billingAddress.countryCode,
+            phone: billingAddress.phone.trim() || undefined,
+          }
+        : shippingAddr
+
       const { cart: updated } = await medusa.store.cart.update(cart.id, {
         shipping_address: shippingAddr,
-        billing_address: shippingAddr,
+        billing_address: billingAddr,
       })
       updateCartState(updated)
+
+      if (customer && selectedSavedAddressId === null && saveAddressToAccount) {
+        try {
+          await medusa.store.customer.createAddress({
+            first_name: address.firstName.trim(),
+            last_name: address.lastName.trim(),
+            company: address.company.trim() || undefined,
+            address_1: address.address1.trim(),
+            postal_code: address.postalCode.trim(),
+            city: address.city.trim(),
+            country_code: address.countryCode,
+            phone: address.phone.trim() || undefined,
+          })
+          const { addresses: refreshed } = await medusa.store.customer.listAddress({ limit: 20, offset: 0 })
+          setSavedAddresses(refreshed ?? [])
+        } catch (err) {
+          console.error("Failed to save address to account:", err)
+        }
+      }
+
       completeStep(2)
       fetchShippingOptions()
     } catch (err) {
@@ -635,12 +637,18 @@ export default function CheckoutPage() {
           cart_id: cart.id,
         })
 
-      const options = (shipping_options ?? []).map((opt) => ({
-        id: opt.id,
-        name: opt.name ?? "Standaard verzending",
-        amount: opt.amount ?? 0,
-        price_type: opt.price_type ?? "flat",
-      }))
+      const options: ShippingOptionData[] = (shipping_options ?? []).map((opt) => {
+        const meta = ((opt as unknown as { metadata?: Record<string, unknown> }).metadata ?? {})
+        return {
+          id: opt.id,
+          name: opt.name ?? "Standaard verzending",
+          amount: opt.amount ?? 0,
+          carrier: typeof meta.carrier === "string" ? meta.carrier : undefined,
+          deliveryEstimate: typeof meta.delivery_estimate === "string" ? meta.delivery_estimate : undefined,
+          tracked: meta.tracked === true,
+          insured: meta.insured === true,
+        }
+      })
 
       setShippingOptions(options)
 
@@ -665,6 +673,11 @@ export default function CheckoutPage() {
         { option_id: optionId }
       )
       updateCartState(updated)
+      if (orderNotes.trim()) {
+        await medusa.store.cart.update(cart.id, {
+          metadata: { ...((cart.metadata as Record<string, unknown>) ?? {}), delivery_notes: orderNotes.trim() },
+        })
+      }
       completeStep(3)
       fetchPaymentProviders()
     } catch {
@@ -751,6 +764,19 @@ export default function CheckoutPage() {
     setIsProcessing(true)
     setGlobalError("")
 
+    // Persist any latest order notes that may have been typed after shipping was picked
+    if (orderNotes.trim() && cart) {
+      try {
+        const { cart: withNotes } = await medusa.store.cart.update(cart.id, {
+          metadata: { ...((cart.metadata as Record<string, unknown> | null) ?? {}), delivery_notes: orderNotes.trim() },
+        })
+        updateCartState(withNotes)
+      } catch (err) {
+        console.error("Failed to persist order notes:", err)
+        // Don't block order placement on notes failure
+      }
+    }
+
     // Viva Wallet: redirect to Smart Checkout instead of completing locally.
     if (selectedPayment === "pp_viva-wallet_viva") {
       const sessions = cart.payment_collection?.payment_sessions
@@ -824,6 +850,30 @@ export default function CheckoutPage() {
             currency: order.currency_code,
           })
         )
+
+        if (customer) {
+          try {
+            const { addresses: existing } = await medusa.store.customer.listAddress({ limit: 1, offset: 0 })
+            if ((existing ?? []).length === 0) {
+              await medusa.store.customer.createAddress({
+                first_name: address.firstName.trim(),
+                last_name: address.lastName.trim(),
+                company: address.company.trim() || undefined,
+                address_1: address.address1.trim(),
+                postal_code: address.postalCode.trim(),
+                city: address.city.trim(),
+                country_code: address.countryCode,
+                phone: address.phone.trim() || undefined,
+                is_default_shipping: true,
+                is_default_billing: true,
+              })
+              sessionStorage.setItem("inovix_first_address_saved", "1")
+            }
+          } catch (err) {
+            console.error("Failed to autosave first address:", err)
+            Sentry.captureException(err, { tags: { feature: "checkout-autosave" } })
+          }
+        }
 
         resetCart()
         router.push("/checkout/bevestiging")
@@ -908,6 +958,14 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <StickyOrderSummary total={cart.total ?? 0} itemCount={cartCount}>
+        <OrderSummary
+          cart={cart}
+          shippingSelected={completedSteps.has(3)}
+          onCartUpdated={updateCartState}
+        />
+      </StickyOrderSummary>
+
       <div className="lg:grid lg:grid-cols-12 lg:gap-16">
         {/* Left column — Form */}
         <div className="lg:col-span-7">
@@ -1015,111 +1073,126 @@ export default function CheckoutPage() {
               onEdit={() => editStep(2)}
             >
               <form onSubmit={handleAddressSubmit}>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Input
-                      label="Voornaam"
-                      placeholder="Jan"
-                      value={address.firstName}
-                      onChange={(e) =>
-                        updateAddress("firstName", e.target.value)
-                      }
-                      error={addressErrors.firstName}
-                      autoFocus
-                      autoComplete="given-name"
-                      name="given-name"
-                    />
-                    <Input
-                      label="Achternaam"
-                      placeholder="de Vries"
-                      value={address.lastName}
-                      onChange={(e) =>
-                        updateAddress("lastName", e.target.value)
-                      }
-                      error={addressErrors.lastName}
-                      autoComplete="family-name"
-                      name="family-name"
-                    />
-                  </div>
-
-                  <Input
-                    label="Bedrijfsnaam (optioneel)"
-                    placeholder="Uw laboratorium of bedrijf"
-                    value={address.company}
-                    onChange={(e) => updateAddress("company", e.target.value)}
-                    autoComplete="organization"
-                    name="organization"
-                  />
-
-                  <Input
-                    label="Adres"
-                    placeholder="Straatnaam 123"
-                    value={address.address1}
-                    onChange={(e) => updateAddress("address1", e.target.value)}
-                    error={addressErrors.address1}
-                    autoComplete="street-address"
-                    name="street-address"
-                  />
-
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Input
-                      label="Postcode"
-                      placeholder="1234 AB"
-                      value={address.postalCode}
-                      onChange={(e) =>
-                        updateAddress("postalCode", e.target.value)
-                      }
-                      error={addressErrors.postalCode}
-                      autoComplete="postal-code"
-                      inputMode="text"
-                      name="postal-code"
-                    />
-                    <Input
-                      label="Stad"
-                      placeholder="Amsterdam"
-                      value={address.city}
-                      onChange={(e) => updateAddress("city", e.target.value)}
-                      error={addressErrors.city}
-                      autoComplete="address-level2"
-                      name="address-level2"
+                {customer && savedAddresses.length > 0 && (
+                  <div className="mb-6">
+                    <p className="mb-3 text-sm text-muted-foreground">
+                      Kies een opgeslagen adres of voer een nieuw adres in.
+                    </p>
+                    <SavedAddressPicker
+                      addresses={savedAddresses}
+                      selectedId={selectedSavedAddressId}
+                      onSelect={(id) => {
+                        setSelectedSavedAddressId(id)
+                        const sel = savedAddresses.find((a) => a.id === id)
+                        if (sel) {
+                          setAddress({
+                            firstName: sel.first_name ?? "",
+                            lastName: sel.last_name ?? "",
+                            company: sel.company ?? "",
+                            address1: sel.address_1 ?? "",
+                            postalCode: sel.postal_code ?? "",
+                            city: sel.city ?? "",
+                            countryCode: sel.country_code ?? "nl",
+                            phone: sel.phone ?? "",
+                          })
+                          setAddressErrors({})
+                        }
+                      }}
+                      onChooseNew={() => {
+                        setSelectedSavedAddressId(null)
+                        setAddress(EMPTY_ADDRESS)
+                      }}
                     />
                   </div>
+                )}
 
-                  <div className="flex flex-col gap-1.5">
-                    <label
-                      htmlFor="country"
-                      className="text-sm font-medium text-navy-500"
-                    >
-                      Land
-                    </label>
-                    <select
-                      id="country"
-                      value={address.countryCode}
-                      onChange={(e) =>
-                        updateAddress("countryCode", e.target.value)
-                      }
-                      autoComplete="country"
-                      name="country"
-                      className="h-11 w-full border border-border bg-transparent px-3 py-2.5 text-base transition-colors outline-none focus:border-navy-500 focus:ring-1 focus:ring-navy-500/20 md:text-sm"
-                    >
-                      {EU_COUNTRIES.map((c) => (
-                        <option key={c.code} value={c.code}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                {(!customer || savedAddresses.length === 0 || selectedSavedAddressId === null) && (
+                  <>
+                    <AddressForm
+                      value={address}
+                      errors={addressErrors}
+                      onChange={(next) => {
+                        setAddress(next)
+                        if (Object.keys(addressErrors).length > 0) setAddressErrors({})
+                      }}
+                      autoFocusFirstField
+                      autocompleteSection="shipping"
+                    />
 
-                  <Input
-                    type="tel"
-                    label="Telefoonnummer (optioneel)"
-                    placeholder="+31 6 12345678"
-                    value={address.phone}
-                    onChange={(e) => updateAddress("phone", e.target.value)}
-                    autoComplete="tel"
-                    inputMode="tel"
-                    name="tel"
-                  />
+                    {customer && (
+                      <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-navy-500">
+                        <input
+                          type="checkbox"
+                          checked={saveAddressToAccount}
+                          onChange={(e) => setSaveAddressToAccount(e.target.checked)}
+                          className="size-4 border-border"
+                        />
+                        Opslaan in mijn account
+                      </label>
+                    )}
+                  </>
+                )}
+
+                <div className="mt-6 border-t border-border pt-6">
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-navy-500">
+                    <input
+                      type="checkbox"
+                      checked={useDifferentBilling}
+                      onChange={(e) => setUseDifferentBilling(e.target.checked)}
+                      className="size-4 border-border"
+                    />
+                    Factuuradres wijkt af van verzendadres
+                  </label>
+
+                  {useDifferentBilling && (
+                    <div className="mt-5">
+                      <p className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                        Factuuradres
+                      </p>
+
+                      {customer && savedAddresses.length > 0 && (
+                        <div className="mb-4">
+                          <SavedAddressPicker
+                            addresses={savedAddresses}
+                            selectedId={billingSelectedId}
+                            onSelect={(id) => {
+                              setBillingSelectedId(id)
+                              const sel = savedAddresses.find((a) => a.id === id)
+                              if (sel) {
+                                setBillingAddress({
+                                  firstName: sel.first_name ?? "",
+                                  lastName: sel.last_name ?? "",
+                                  company: sel.company ?? "",
+                                  address1: sel.address_1 ?? "",
+                                  postalCode: sel.postal_code ?? "",
+                                  city: sel.city ?? "",
+                                  countryCode: sel.country_code ?? "nl",
+                                  phone: sel.phone ?? "",
+                                })
+                                setBillingErrors({})
+                              }
+                            }}
+                            onChooseNew={() => {
+                              setBillingSelectedId(null)
+                              setBillingAddress(EMPTY_ADDRESS)
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {(!customer || savedAddresses.length === 0 || billingSelectedId === null) && (
+                        <AddressForm
+                          value={billingAddress}
+                          errors={billingErrors}
+                          onChange={(next) => {
+                            setBillingAddress(next)
+                            if (Object.keys(billingErrors).length > 0) setBillingErrors({})
+                          }}
+                          autocompleteSection="billing"
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-5">
@@ -1164,52 +1237,32 @@ export default function CheckoutPage() {
                   Geen verzendopties beschikbaar voor dit adres.
                 </p>
               ) : (
-                <div className="space-y-2">
-                  {shippingOptions.map((option) => (
-                    <label
-                      key={option.id}
-                      className={cn(
-                        "flex cursor-pointer items-center justify-between border px-4 py-3 transition-colors focus-within:border-navy-500 focus-within:ring-1 focus-within:ring-navy-500/20",
-                        selectedShipping === option.id
-                          ? "border-navy-500 bg-navy-500/[0.02]"
-                          : "border-border hover:border-navy-200",
-                        isProcessing && "pointer-events-none opacity-60"
-                      )}
-                    >
-                      <input
-                        type="radio"
-                        name="shipping_option"
-                        value={option.id}
-                        checked={selectedShipping === option.id}
-                        onChange={() => selectShippingOption(option.id)}
+                <>
+                  <div className="space-y-2" role="radiogroup" aria-label="Verzendmethode">
+                    {shippingOptions.map((option) => (
+                      <ShippingOptionCard
+                        key={option.id}
+                        option={option}
+                        selected={selectedShipping === option.id}
                         disabled={isProcessing}
-                        className="sr-only"
+                        onSelect={selectShippingOption}
                       />
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={cn(
-                            "flex size-4 items-center justify-center border",
-                            selectedShipping === option.id
-                              ? "border-navy-500"
-                              : "border-border"
-                          )}
-                        >
-                          {selectedShipping === option.id && (
-                            <div className="size-2 bg-navy-500" />
-                          )}
-                        </div>
-                        <span className="text-sm text-navy-500">
-                          {option.name}
-                        </span>
-                      </div>
-                      <span className="text-sm tabular-nums text-navy-500">
-                        {option.amount
-                          ? formatPrice(option.amount)
-                          : "Gratis"}
-                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-6">
+                    <label htmlFor="order-notes" className="mb-1.5 block text-sm font-medium text-navy-500">
+                      Opmerkingen voor bezorger (optioneel)
                     </label>
-                  ))}
-                </div>
+                    <textarea
+                      id="order-notes"
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      rows={3}
+                      className="w-full border border-border bg-transparent px-3 py-2.5 text-sm transition-colors outline-none focus:border-navy-500 focus:ring-1 focus:ring-navy-500/20"
+                      placeholder="Bijv. afgeven bij buren op nummer 12"
+                    />
+                  </div>
+                </>
               )}
             </StepSection>
 
@@ -1322,6 +1375,8 @@ export default function CheckoutPage() {
                       voor menselijke of veterinaire consumptie.
                     </span>
                   </label>
+
+                  <TrustBlock />
 
                   <Button
                     variant="primary"

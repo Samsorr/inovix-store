@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Check } from "lucide-react"
 
 import { formatPrice } from "@/lib/price"
 import { Button } from "@/components/ui/button"
+import { SavedAddressToast } from "@/components/checkout/SavedAddressToast"
+import { useAuth } from "@/lib/context/auth-context"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,6 +47,7 @@ interface OrderData {
 
 export default function BevestigingPage() {
   const router = useRouter()
+  const { customer } = useAuth()
   const [order, setOrder] = useState<OrderData | null>(null)
 
   useEffect(() => {
@@ -77,6 +81,8 @@ export default function BevestigingPage() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-14 sm:px-6">
+      <SavedAddressToast />
+
       {/* Success indicator */}
       <div className="flex items-center gap-3">
         <div className="flex size-6 items-center justify-center bg-navy-500">
@@ -186,6 +192,38 @@ export default function BevestigingPage() {
         Alle producten zijn uitsluitend bestemd voor laboratoriumonderzoek.
         Niet voor menselijke of veterinaire consumptie.
       </p>
+
+      {/* Guest account CTA */}
+      {!customer && order && (
+        <div className="mt-8 border border-border p-5">
+          <p className="text-sm font-semibold text-navy-500">
+            Maak een account aan en volg uw bestellingen
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We hebben uw e-mailadres en bezorgadres alvast voor u klaargezet.
+          </p>
+          <div className="mt-4">
+            <Link
+              href="/account/registratie?prefill=true"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  sessionStorage.setItem(
+                    "inovix_signup_prefill",
+                    JSON.stringify({
+                      email: order.email ?? "",
+                      first_name: order.shippingAddress?.first_name ?? "",
+                      last_name: order.shippingAddress?.last_name ?? "",
+                    })
+                  )
+                }
+              }}
+              className="inline-block border border-navy-500 bg-white px-5 py-2.5 text-sm font-medium text-navy-500 hover:bg-navy-500 hover:text-white"
+            >
+              Account aanmaken
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* CTA */}
       <div className="mt-10">

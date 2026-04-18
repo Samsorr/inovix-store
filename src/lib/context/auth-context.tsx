@@ -33,6 +33,7 @@ interface AuthContextValue {
   updateProfile: (data: {
     first_name?: string
     last_name?: string
+    phone?: string
   }) => Promise<void>
   refreshCustomer: () => Promise<void>
 }
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateProfile = useCallback(
-    async (data: { first_name?: string; last_name?: string }) => {
+    async (data: { first_name?: string; last_name?: string; phone?: string }) => {
       const { customer: c } = await medusa.store.customer.update(data)
       setCustomer(c)
     },
