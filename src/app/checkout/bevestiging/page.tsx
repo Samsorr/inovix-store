@@ -6,6 +6,7 @@ import { Check } from "lucide-react"
 
 import { formatPrice } from "@/lib/price"
 import { Button } from "@/components/ui/button"
+import { SavedAddressToast } from "@/components/checkout/SavedAddressToast"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -77,6 +78,8 @@ export default function BevestigingPage() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-14 sm:px-6">
+      <SavedAddressToast />
+
       {/* Success indicator */}
       <div className="flex items-center gap-3">
         <div className="flex size-6 items-center justify-center bg-navy-500">

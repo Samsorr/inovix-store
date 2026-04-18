@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react"
 
 import medusa from "@/lib/medusa"
 import { useCart } from "@/lib/context/cart-context"
+import { useAuth } from "@/lib/context/auth-context"
+import * as Sentry from "@sentry/nextjs"
 
 // Viva eventId codes documented at
 // https://developer.viva.com/integration-reference/response-codes/ — map a
@@ -53,6 +55,7 @@ export default function VivaReturnPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { resetCart } = useCart()
+  const { customer } = useAuth()
 
   const [message, setMessage] = useState("Uw betaling wordt gecontroleerd...")
   const processedRef = useRef(false)
@@ -141,6 +144,33 @@ export default function VivaReturnPage() {
         )
 
         sessionStorage.removeItem("inovix_pending_viva_cart")
+
+        // Autosave the shipping address for first-time customers (zero saved addresses).
+        if (customer && pending?.shippingAddress) {
+          try {
+            const sa = pending.shippingAddress
+            const { addresses } = await medusa.store.customer.listAddress({ limit: 1, offset: 0 })
+            if ((addresses ?? []).length === 0) {
+              await medusa.store.customer.createAddress({
+                first_name: (sa.first_name as string) ?? "",
+                last_name: (sa.last_name as string) ?? "",
+                company: (sa.company as string) ?? undefined,
+                address_1: (sa.address_1 as string) ?? "",
+                postal_code: (sa.postal_code as string) ?? "",
+                city: (sa.city as string) ?? "",
+                country_code: (sa.country_code as string) ?? "nl",
+                phone: (sa.phone as string) ?? undefined,
+                is_default_shipping: true,
+                is_default_billing: true,
+              })
+              sessionStorage.setItem("inovix_first_address_saved", "1")
+            }
+          } catch (err) {
+            console.error("Failed to autosave from Viva return:", err)
+            Sentry.captureException(err, { tags: { feature: "viva-return-autosave" } })
+          }
+        }
+
         resetCart()
         router.replace("/checkout/bevestiging")
       } catch {

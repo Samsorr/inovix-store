@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { cn } from "@/lib/utils"
+import * as Sentry from "@sentry/nextjs"
 
 import { CheckoutStepper } from "./CheckoutStepper"
 import { PromoCodeInput } from "./PromoCodeInput"
@@ -407,7 +408,19 @@ export default function CheckoutPage() {
           setSavedAddresses(addresses ?? [])
           setSelectedSavedAddressId(addr?.id ?? null)
         }
-        if (cancelled || !addr) {
+        if (!addr) {
+          if (!cancelled) {
+            setAddress({
+              ...EMPTY_ADDRESS,
+              firstName: customer.first_name ?? "",
+              lastName: customer.last_name ?? "",
+              phone: customer.phone ?? "",
+            })
+            setActiveStep(2)
+          }
+          return
+        }
+        if (cancelled) {
           setActiveStep(2)
           return
         }
@@ -811,6 +824,30 @@ export default function CheckoutPage() {
             currency: order.currency_code,
           })
         )
+
+        if (customer) {
+          try {
+            const { addresses: existing } = await medusa.store.customer.listAddress({ limit: 1, offset: 0 })
+            if ((existing ?? []).length === 0) {
+              await medusa.store.customer.createAddress({
+                first_name: address.firstName.trim(),
+                last_name: address.lastName.trim(),
+                company: address.company.trim() || undefined,
+                address_1: address.address1.trim(),
+                postal_code: address.postalCode.trim(),
+                city: address.city.trim(),
+                country_code: address.countryCode,
+                phone: address.phone.trim() || undefined,
+                is_default_shipping: true,
+                is_default_billing: true,
+              })
+              sessionStorage.setItem("inovix_first_address_saved", "1")
+            }
+          } catch (err) {
+            console.error("Failed to autosave first address:", err)
+            Sentry.captureException(err, { tags: { feature: "checkout-autosave" } })
+          }
+        }
 
         resetCart()
         router.push("/checkout/bevestiging")
