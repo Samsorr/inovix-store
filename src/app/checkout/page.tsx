@@ -295,6 +295,12 @@ export default function CheckoutPage() {
   const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(null)
   const [saveAddressToAccount, setSaveAddressToAccount] = useState(true)
 
+  // Step 2: Billing address (optional separate)
+  const [useDifferentBilling, setUseDifferentBilling] = useState(false)
+  const [billingAddress, setBillingAddress] = useState<AddressFormValue>(EMPTY_ADDRESS)
+  const [billingErrors, setBillingErrors] = useState<Partial<Record<keyof AddressFormValue, string>>>({})
+  const [billingSelectedId, setBillingSelectedId] = useState<string | null>(null)
+
   // Step 3: Shipping
   const [shippingOptions, setShippingOptions] = useState<
     Array<{ id: string; name: string; amount: number; price_type: string }>
@@ -528,6 +534,19 @@ export default function CheckoutPage() {
       return
     }
 
+    if (useDifferentBilling) {
+      const bErrors: Partial<Record<keyof AddressFormValue, string>> = {}
+      if (!billingAddress.firstName.trim()) bErrors.firstName = "Voornaam is verplicht"
+      if (!billingAddress.lastName.trim()) bErrors.lastName = "Achternaam is verplicht"
+      if (!billingAddress.address1.trim()) bErrors.address1 = "Adres is verplicht"
+      if (!billingAddress.postalCode.trim()) bErrors.postalCode = "Postcode is verplicht"
+      if (!billingAddress.city.trim()) bErrors.city = "Stad is verplicht"
+      if (Object.keys(bErrors).length > 0) {
+        setBillingErrors(bErrors)
+        return
+      }
+    }
+
     setIsProcessing(true)
     try {
       const shippingAddr = {
@@ -540,9 +559,23 @@ export default function CheckoutPage() {
         country_code: address.countryCode,
         phone: address.phone.trim() || undefined,
       }
+
+      const billingAddr = useDifferentBilling
+        ? {
+            first_name: billingAddress.firstName.trim(),
+            last_name: billingAddress.lastName.trim(),
+            company: billingAddress.company.trim() || undefined,
+            address_1: billingAddress.address1.trim(),
+            postal_code: billingAddress.postalCode.trim(),
+            city: billingAddress.city.trim(),
+            country_code: billingAddress.countryCode,
+            phone: billingAddress.phone.trim() || undefined,
+          }
+        : shippingAddr
+
       const { cart: updated } = await medusa.store.cart.update(cart.id, {
         shipping_address: shippingAddr,
-        billing_address: shippingAddr,
+        billing_address: billingAddr,
       })
       updateCartState(updated)
 
@@ -1028,6 +1061,68 @@ export default function CheckoutPage() {
                     )}
                   </>
                 )}
+
+                <div className="mt-6 border-t border-border pt-6">
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-navy-500">
+                    <input
+                      type="checkbox"
+                      checked={useDifferentBilling}
+                      onChange={(e) => setUseDifferentBilling(e.target.checked)}
+                      className="size-4 border-border"
+                    />
+                    Factuuradres wijkt af van verzendadres
+                  </label>
+
+                  {useDifferentBilling && (
+                    <div className="mt-5">
+                      <p className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                        Factuuradres
+                      </p>
+
+                      {customer && savedAddresses.length > 0 && (
+                        <div className="mb-4">
+                          <SavedAddressPicker
+                            addresses={savedAddresses}
+                            selectedId={billingSelectedId}
+                            onSelect={(id) => {
+                              setBillingSelectedId(id)
+                              const sel = savedAddresses.find((a) => a.id === id)
+                              if (sel) {
+                                setBillingAddress({
+                                  firstName: sel.first_name ?? "",
+                                  lastName: sel.last_name ?? "",
+                                  company: sel.company ?? "",
+                                  address1: sel.address_1 ?? "",
+                                  postalCode: sel.postal_code ?? "",
+                                  city: sel.city ?? "",
+                                  countryCode: sel.country_code ?? "nl",
+                                  phone: sel.phone ?? "",
+                                })
+                                setBillingErrors({})
+                              }
+                            }}
+                            onChooseNew={() => {
+                              setBillingSelectedId(null)
+                              setBillingAddress(EMPTY_ADDRESS)
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {(!customer || savedAddresses.length === 0 || billingSelectedId === null) && (
+                        <AddressForm
+                          value={billingAddress}
+                          errors={billingErrors}
+                          onChange={(next) => {
+                            setBillingAddress(next)
+                            if (Object.keys(billingErrors).length > 0) setBillingErrors({})
+                          }}
+                          autocompleteSection="billing"
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 <div className="mt-5">
                   <Button
