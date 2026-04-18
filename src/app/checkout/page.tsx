@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 import { CheckoutStepper } from "./CheckoutStepper"
 import { PromoCodeInput } from "./PromoCodeInput"
 import { AddressForm, EMPTY_ADDRESS, type AddressFormValue } from "@/components/checkout/AddressForm"
+import { SavedAddressPicker, type SavedAddress } from "@/components/checkout/SavedAddressPicker"
 
 // ---------------------------------------------------------------------------
 // Step Section — clean, editorial accordion
@@ -290,6 +291,9 @@ export default function CheckoutPage() {
   const [addressErrors, setAddressErrors] = useState<
     Partial<Record<keyof AddressFormValue, string>>
   >({})
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(null)
+  const [saveAddressToAccount, setSaveAddressToAccount] = useState(true)
 
   // Step 3: Shipping
   const [shippingOptions, setShippingOptions] = useState<
@@ -393,6 +397,10 @@ export default function CheckoutPage() {
           addresses?.find((a) => a.is_default_shipping) ??
           addresses?.[0] ??
           undefined
+        if (!cancelled) {
+          setSavedAddresses(addresses ?? [])
+          setSelectedSavedAddressId(addr?.id ?? null)
+        }
         if (cancelled || !addr) {
           setActiveStep(2)
           return
@@ -537,6 +545,26 @@ export default function CheckoutPage() {
         billing_address: shippingAddr,
       })
       updateCartState(updated)
+
+      if (customer && selectedSavedAddressId === null && saveAddressToAccount) {
+        try {
+          await medusa.store.customer.createAddress({
+            first_name: address.firstName.trim(),
+            last_name: address.lastName.trim(),
+            company: address.company.trim() || undefined,
+            address_1: address.address1.trim(),
+            postal_code: address.postalCode.trim(),
+            city: address.city.trim(),
+            country_code: address.countryCode,
+            phone: address.phone.trim() || undefined,
+          })
+          const { addresses: refreshed } = await medusa.store.customer.listAddress({ limit: 20, offset: 0 })
+          setSavedAddresses(refreshed ?? [])
+        } catch (err) {
+          console.error("Failed to save address to account:", err)
+        }
+      }
+
       completeStep(2)
       fetchShippingOptions()
     } catch (err) {
@@ -941,16 +969,65 @@ export default function CheckoutPage() {
               onEdit={() => editStep(2)}
             >
               <form onSubmit={handleAddressSubmit}>
-                <AddressForm
-                  value={address}
-                  errors={addressErrors}
-                  onChange={(next) => {
-                    setAddress(next)
-                    if (Object.keys(addressErrors).length > 0) setAddressErrors({})
-                  }}
-                  autoFocusFirstField
-                  autocompleteSection="shipping"
-                />
+                {customer && savedAddresses.length > 0 && (
+                  <div className="mb-6">
+                    <p className="mb-3 text-sm text-muted-foreground">
+                      Kies een opgeslagen adres of voer een nieuw adres in.
+                    </p>
+                    <SavedAddressPicker
+                      addresses={savedAddresses}
+                      selectedId={selectedSavedAddressId}
+                      onSelect={(id) => {
+                        setSelectedSavedAddressId(id)
+                        const sel = savedAddresses.find((a) => a.id === id)
+                        if (sel) {
+                          setAddress({
+                            firstName: sel.first_name ?? "",
+                            lastName: sel.last_name ?? "",
+                            company: sel.company ?? "",
+                            address1: sel.address_1 ?? "",
+                            postalCode: sel.postal_code ?? "",
+                            city: sel.city ?? "",
+                            countryCode: sel.country_code ?? "nl",
+                            phone: sel.phone ?? "",
+                          })
+                          setAddressErrors({})
+                        }
+                      }}
+                      onChooseNew={() => {
+                        setSelectedSavedAddressId(null)
+                        setAddress(EMPTY_ADDRESS)
+                      }}
+                    />
+                  </div>
+                )}
+
+                {(!customer || savedAddresses.length === 0 || selectedSavedAddressId === null) && (
+                  <>
+                    <AddressForm
+                      value={address}
+                      errors={addressErrors}
+                      onChange={(next) => {
+                        setAddress(next)
+                        if (Object.keys(addressErrors).length > 0) setAddressErrors({})
+                      }}
+                      autoFocusFirstField
+                      autocompleteSection="shipping"
+                    />
+
+                    {customer && (
+                      <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-navy-500">
+                        <input
+                          type="checkbox"
+                          checked={saveAddressToAccount}
+                          onChange={(e) => setSaveAddressToAccount(e.target.checked)}
+                          className="size-4 border-border"
+                        />
+                        Opslaan in mijn account
+                      </label>
+                    )}
+                  </>
+                )}
 
                 <div className="mt-5">
                   <Button
