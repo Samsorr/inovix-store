@@ -23,6 +23,7 @@ import { SavedAddressPicker, type SavedAddress } from "@/components/checkout/Sav
 import { ShippingOptionCard, type ShippingOptionData } from "@/components/checkout/ShippingOptionCard"
 import { StickyOrderSummary } from "@/components/checkout/StickyOrderSummary"
 import { TrustBlock } from "@/components/checkout/TrustBlock"
+import { LoginGuestFork } from "@/components/checkout/LoginGuestFork"
 
 // ---------------------------------------------------------------------------
 // Step Section — clean, editorial accordion
@@ -284,6 +285,7 @@ export default function CheckoutPage() {
 
   // Step management
   const [activeStep, setActiveStep] = useState(1)
+  const [guestChoiceMade, setGuestChoiceMade] = useState(false)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
 
   // Step 1: Email
@@ -973,49 +975,49 @@ export default function CheckoutPage() {
             <h1 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-navy-500">
               Checkout
             </h1>
-            {customer ? (
+            {customer && (
               <p className="text-[12px] text-muted-foreground">
                 Ingelogd als{" "}
                 <span className="font-medium text-navy-500">
                   {customer.email}
                 </span>
               </p>
-            ) : (
-              <p className="text-[12px] text-muted-foreground">
-                Al klant?{" "}
-                <Link
-                  href="/account/login?redirect=/checkout"
-                  className="font-medium text-navy-500 underline underline-offset-4 decoration-border hover:decoration-navy-500"
-                >
-                  Inloggen
-                </Link>
-              </p>
             )}
           </div>
 
-          {/* Progress stepper */}
-          <div className="mt-6">
-            <CheckoutStepper
-              steps={[
-                { num: 1, label: "E-mail" },
-                { num: 2, label: "Adres" },
-                { num: 3, label: "Verzending" },
-                { num: 4, label: "Betaling" },
-              ]}
-              activeStep={activeStep}
-              completedSteps={completedSteps}
-              onEdit={editStep}
-            />
-          </div>
-
-          {/* Global error */}
-          {globalError && (
-            <div className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
-              {globalError}
+          {!customer && !guestChoiceMade && !cart.email && (
+            <div className="mt-8">
+              <LoginGuestFork
+                onContinueAsGuest={() => setGuestChoiceMade(true)}
+              />
             </div>
           )}
 
-          <div className="mt-8 border-t border-border">
+          {(customer || guestChoiceMade || cart.email) && (
+            <>
+              {/* Progress stepper */}
+              <div className="mt-6">
+                <CheckoutStepper
+                  steps={[
+                    { num: 1, label: "E-mail" },
+                    { num: 2, label: "Adres" },
+                    { num: 3, label: "Verzending" },
+                    { num: 4, label: "Betaling" },
+                  ]}
+                  activeStep={activeStep}
+                  completedSteps={completedSteps}
+                  onEdit={editStep}
+                />
+              </div>
+
+              {/* Global error */}
+              {globalError && (
+                <div className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
+                  {globalError}
+                </div>
+              )}
+
+              <div className="mt-8 border-t border-border">
             {/* ── Step 1: Email ── */}
             <StepSection
               step={1}
@@ -1384,7 +1386,7 @@ export default function CheckoutPage() {
                     fullWidth
                     onClick={handlePlaceOrder}
                     disabled={isProcessing || !researchConfirmed}
-                    className="text-sm font-semibold uppercase tracking-wider"
+                    className="gradient-brand border-0 text-sm font-semibold uppercase tracking-wider text-white shadow-sm transition-all duration-300 hover:-translate-y-px hover:shadow-md disabled:opacity-60"
                   >
                     {isProcessing && (
                       <Loader2 className="size-4 animate-spin" />
@@ -1394,7 +1396,9 @@ export default function CheckoutPage() {
                 </div>
               )}
             </StepSection>
-          </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Right column — Order Summary */}
