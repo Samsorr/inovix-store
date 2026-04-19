@@ -53,13 +53,14 @@ export function AddressForm({
 
   const ac = (token: string) => (autocompleteSection ? `${autocompleteSection} ${token}` : token)
 
-  const supportsLookup = value.countryCode === "nl" || value.countryCode === "be"
+  const supportsLookup = value.countryCode === "nl"
 
   return (
     <div className={cn("space-y-4", className)}>
       {supportsLookup && (
-        <div className="border border-border bg-surface-secondary/40 p-4">
-          <p className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+        <div className="rounded-lg border border-teal-200/60 bg-teal-50/40 p-4">
+          <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-teal-700">
+            <span className="size-1.5 rounded-full bg-teal-500" />
             Snelle invoer
           </p>
           <PostcodeLookup

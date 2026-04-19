@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Loader2 } from "lucide-react"
+import { Check, Loader2, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   isValidHouseNumber,
@@ -28,6 +28,7 @@ export function PostcodeLookup({ country, onResolved, className }: PostcodeLooku
   const [houseNumber, setHouseNumber] = useState("")
   const [addition, setAddition] = useState("")
   const [loading, setLoading] = useState(false)
+  const [resolved, setResolved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const abortRef = useRef<AbortController | null>(null)
@@ -42,6 +43,7 @@ export function PostcodeLookup({ country, onResolved, className }: PostcodeLooku
     if (!isValidHouseNumber(houseNumber)) return
 
     setError(null)
+    setResolved(false)
     const t = setTimeout(async () => {
       abortRef.current?.abort()
       const controller = new AbortController()
@@ -60,6 +62,7 @@ export function PostcodeLookup({ country, onResolved, className }: PostcodeLooku
         const address1 = trimmedAddition
           ? `${result.street} ${houseNumber}${trimmedAddition}`
           : `${result.street} ${houseNumber}`
+        setResolved(true)
         // onResolved is read from a ref to avoid re-firing the lookup on every parent render
         onResolvedRef.current({ address1, city: result.city, postcode: result.postcode })
       } else if (result.error === "not_found") {
@@ -82,9 +85,9 @@ export function PostcodeLookup({ country, onResolved, className }: PostcodeLooku
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Input
           label="Postcode"
-          placeholder={country === "nl" ? "1234AB" : "1000"}
+          placeholder="1234AB"
           value={postcode}
-          onChange={(e) => setPostcode(country === "nl" ? normalizePostcode(e.target.value, "nl") : e.target.value)}
+          onChange={(e) => setPostcode(normalizePostcode(e.target.value, "nl"))}
           name="lookup-postcode"
           autoComplete="off"
         />
@@ -106,12 +109,28 @@ export function PostcodeLookup({ country, onResolved, className }: PostcodeLooku
           autoComplete="off"
         />
       </div>
-      <div className="mt-2 flex h-5 items-center gap-2 text-xs text-muted-foreground">
+      <div
+        role="status"
+        aria-live="polite"
+        className="mt-2 flex h-5 items-center gap-2 text-xs"
+      >
         {loading && (
-          <>
+          <span className="inline-flex items-center gap-2 text-muted-foreground">
             <Loader2 className="size-3 animate-spin" />
-            <span>Adres ophalen...</span>
-          </>
+            Adres ophalen...
+          </span>
+        )}
+        {!loading && resolved && !error && (
+          <span className="inline-flex items-center gap-2 text-teal-600">
+            <Check className="size-3" strokeWidth={2.5} />
+            Adres gevonden | velden hieronder ingevuld
+          </span>
+        )}
+        {!loading && !resolved && !error && !postcode && !houseNumber && (
+          <span className="inline-flex items-center gap-2 text-muted-foreground">
+            <Search className="size-3" />
+            Vul postcode en huisnummer in om uw adres op te halen
+          </span>
         )}
         {!loading && error && <span className="text-red-700">{error}</span>}
       </div>

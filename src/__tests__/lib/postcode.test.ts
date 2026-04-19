@@ -14,18 +14,9 @@ describe("isValidPostcode", () => {
     expect(isValidPostcode("ABCD12", "nl")).toBe(false)
   })
 
-  it("accepts BE 4-digit postcode", () => {
-    expect(isValidPostcode("1000", "be")).toBe(true)
-    expect(isValidPostcode("9999", "be")).toBe(true)
-  })
-
-  it("rejects malformed BE postcodes", () => {
-    expect(isValidPostcode("100", "be")).toBe(false)
-    expect(isValidPostcode("AB12", "be")).toBe(false)
-  })
-
   it("returns false for unsupported countries", () => {
     expect(isValidPostcode("12345", "de")).toBe(false)
+    expect(isValidPostcode("1000", "be")).toBe(false)
   })
 })
 
@@ -35,7 +26,7 @@ describe("normalizePostcode", () => {
     expect(normalizePostcode("1234 ab", "nl")).toBe("1234 AB")
   })
 
-  it("returns BE postcode unchanged", () => {
-    expect(normalizePostcode("1000", "be")).toBe("1000")
+  it("returns non-NL postcodes unchanged", () => {
+    expect(normalizePostcode("10115", "de")).toBe("10115")
   })
 })

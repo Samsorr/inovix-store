@@ -1,12 +1,10 @@
-export type SupportedCountry = "nl" | "be"
+export type SupportedCountry = "nl"
 
 const NL_POSTCODE = /^(\d{4})\s?([A-Za-z]{2})$/
-const BE_POSTCODE = /^\d{4}$/
 
 export function isValidPostcode(postcode: string, country: string): boolean {
   const trimmed = postcode.trim()
   if (country === "nl") return NL_POSTCODE.test(trimmed)
-  if (country === "be") return BE_POSTCODE.test(trimmed)
   return false
 }
 

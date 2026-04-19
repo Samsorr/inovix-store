@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server"
-import { isValidPostcode, isValidHouseNumber, type SupportedCountry } from "@/lib/postcode"
+import { isValidHouseNumber, isValidPostcode, normalizePostcode } from "@/lib/postcode"
 
-const POSTCODE_TECH_BASE = "https://api.postcode.tech/v1/postcode"
-const POSTCODE_TECH_KEY = process.env.POSTCODE_TECH_KEY ?? ""
+const PDOK_BASE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free"
 
 const cache = new Map<string, { at: number; payload: unknown }>()
 const CACHE_TTL_MS = 60 * 60 * 1000
 
 export const runtime = "nodejs"
+
+type PdokDoc = {
+  straatnaam?: string
+  woonplaatsnaam?: string
+  postcode?: string
+  huisnummer?: number | string
+  huis_nlt?: string
+}
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
@@ -15,13 +22,13 @@ export async function GET(req: Request) {
   const postcode = url.searchParams.get("postcode") ?? ""
   const number = url.searchParams.get("number") ?? ""
 
-  if (country !== "nl" && country !== "be") {
+  if (country !== "nl") {
     return NextResponse.json({ error: "unsupported_country" }, { status: 400 })
   }
   if (postcode.length > 7) {
     return NextResponse.json({ error: "invalid_postcode" }, { status: 400 })
   }
-  if (!isValidPostcode(postcode, country as SupportedCountry)) {
+  if (!isValidPostcode(postcode, "nl")) {
     return NextResponse.json({ error: "invalid_postcode" }, { status: 400 })
   }
   if (number.length > 6) {
@@ -31,32 +38,37 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "invalid_number" }, { status: 400 })
   }
 
-  const cacheKey = `${country}:${postcode}:${number}`
+  const normalizedPostcode = normalizePostcode(postcode, "nl").replace(" ", "")
+  const cacheKey = `nl:${normalizedPostcode}:${number}`
   const cached = cache.get(cacheKey)
   if (cached && Date.now() - cached.at < CACHE_TTL_MS) {
     return NextResponse.json(cached.payload)
   }
 
-  const upstreamUrl = `${POSTCODE_TECH_BASE}?postcode=${encodeURIComponent(postcode)}&number=${encodeURIComponent(number)}`
+  const query = `${normalizedPostcode} ${number}`
+  const upstreamUrl = `${PDOK_BASE}?q=${encodeURIComponent(query)}&fq=type:adres&rows=1`
 
   try {
     const res = await fetch(upstreamUrl, {
-      headers: POSTCODE_TECH_KEY ? { Authorization: `Bearer ${POSTCODE_TECH_KEY}` } : {},
+      headers: { Accept: "application/json" },
     })
-    if (res.status === 404) {
-      return NextResponse.json({ error: "not_found" }, { status: 404 })
-    }
     if (res.status === 429) {
       return NextResponse.json({ error: "rate_limited" }, { status: 429 })
     }
     if (!res.ok) {
+      console.error("[postcode-lookup] upstream non-ok", res.status)
       return NextResponse.json({ error: "upstream" }, { status: 502 })
     }
-    const data = (await res.json()) as { street?: string; city?: string; postcode?: string }
-    if (!data.street || !data.city || !data.postcode) {
-      return NextResponse.json({ error: "malformed_upstream" }, { status: 502 })
+    const data = (await res.json()) as { response?: { docs?: PdokDoc[] } }
+    const doc = data.response?.docs?.[0]
+    if (!doc || !doc.straatnaam || !doc.woonplaatsnaam || !doc.postcode) {
+      return NextResponse.json({ error: "not_found" }, { status: 404 })
     }
-    const payload = { street: data.street, city: data.city, postcode: data.postcode }
+    const payload = {
+      street: doc.straatnaam,
+      city: doc.woonplaatsnaam,
+      postcode: doc.postcode,
+    }
     const now = Date.now()
     for (const [k, v] of cache) {
       if (now - v.at >= CACHE_TTL_MS) cache.delete(k)

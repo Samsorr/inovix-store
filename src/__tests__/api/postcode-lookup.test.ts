@@ -7,13 +7,21 @@ function makeRequest(query: Record<string, string>) {
   return new Request(url)
 }
 
-describe("GET /api/postcode-lookup", () => {
+function pdokResponse(doc: Record<string, unknown> | null) {
+  const body = doc ? { response: { docs: [doc] } } : { response: { docs: [] } }
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { "content-type": "application/json" },
+  })
+}
+
+describe("GET /api/postcode-lookup (PDOK)", () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
 
-  it("returns 400 when country is unsupported", async () => {
-    const res = await GET(makeRequest({ country: "de", postcode: "12345", number: "1" }))
+  it("returns 400 when country is not nl", async () => {
+    const res = await GET(makeRequest({ country: "be", postcode: "1000", number: "1" }))
     expect(res.status).toBe(400)
   })
 
@@ -22,14 +30,21 @@ describe("GET /api/postcode-lookup", () => {
     expect(res.status).toBe(400)
   })
 
-  it("proxies postcode.tech and returns normalized result", async () => {
+  it("returns 400 when number exceeds length cap", async () => {
+    const res = await GET(makeRequest({ country: "nl", postcode: "1012LG", number: "1234567" }))
+    expect(res.status).toBe(400)
+  })
+
+  it("proxies PDOK and returns normalized result", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
-        new Response(
-          JSON.stringify({ street: "Damrak", city: "Amsterdam", postcode: "1012LG" }),
-          { status: 200, headers: { "content-type": "application/json" } }
-        )
+        pdokResponse({
+          straatnaam: "Damrak",
+          woonplaatsnaam: "Amsterdam",
+          postcode: "1012LG",
+          huisnummer: 1,
+        })
       )
     )
     const res = await GET(makeRequest({ country: "nl", postcode: "1012LG", number: "1" }))
@@ -38,20 +53,21 @@ describe("GET /api/postcode-lookup", () => {
     expect(body).toEqual({ street: "Damrak", city: "Amsterdam", postcode: "1012LG" })
   })
 
-  it("forwards 404 from upstream", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 404 })))
+  it("returns 404 when PDOK returns zero docs", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(pdokResponse(null)))
     const res = await GET(makeRequest({ country: "nl", postcode: "9999XX", number: "999" }))
     expect(res.status).toBe(404)
-  })
-
-  it("returns 400 when number exceeds length cap", async () => {
-    const res = await GET(makeRequest({ country: "nl", postcode: "1012LG", number: "1234567" }))
-    expect(res.status).toBe(400)
   })
 
   it("forwards 429 from upstream", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 429 })))
     const res = await GET(makeRequest({ country: "nl", postcode: "1011AB", number: "2" }))
     expect(res.status).toBe(429)
+  })
+
+  it("returns 502 when upstream throws", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("ENOTFOUND")))
+    const res = await GET(makeRequest({ country: "nl", postcode: "1015JB", number: "3" }))
+    expect(res.status).toBe(502)
   })
 })
