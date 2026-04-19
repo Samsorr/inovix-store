@@ -295,7 +295,13 @@ export default function CheckoutPage() {
 
   // Step management
   const [activeStep, setActiveStep] = useState(1)
-  const [guestChoiceMade, setGuestChoiceMade] = useState(false)
+  const [guestChoiceMade, setGuestChoiceMadeState] = useState(false)
+  const setGuestChoiceMade = useCallback((v: boolean) => {
+    setGuestChoiceMadeState(v)
+    if (typeof window === "undefined") return
+    if (v) sessionStorage.setItem("inovix_guest_choice", "1")
+    else sessionStorage.removeItem("inovix_guest_choice")
+  }, [])
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
 
   // Step 1: Email
@@ -348,6 +354,16 @@ export default function CheckoutPage() {
   useEffect(() => {
     closeCart()
   }, [closeCart])
+
+  // Restore guest-choice flag from sessionStorage so the fork does not
+  // reappear mid-flow after a refresh.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (sessionStorage.getItem("inovix_guest_choice") === "1") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setGuestChoiceMadeState(true)
+    }
+  }, [])
 
   // Surface Viva return errors (customer cancelled or authorisation failed)
   useEffect(() => {
@@ -997,7 +1013,7 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {!customer && !guestChoiceMade && !cart.email && (
+          {!customer && !guestChoiceMade && (
             <div className="mt-8">
               <LoginGuestFork
                 onContinueAsGuest={() => setGuestChoiceMade(true)}
@@ -1005,7 +1021,7 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          {(customer || guestChoiceMade || cart.email) && (
+          {(customer || guestChoiceMade) && (
             <>
               {/* Progress stepper */}
               <div className="mt-6">
