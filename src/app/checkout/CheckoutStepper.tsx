@@ -1,12 +1,13 @@
 "use client"
 
-import { Check } from "lucide-react"
+import { Check, type LucideIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 interface Step {
   num: number
   label: string
+  icon: LucideIcon
 }
 
 interface CheckoutStepperProps {
@@ -24,20 +25,42 @@ export function CheckoutStepper({
 }: CheckoutStepperProps) {
   const currentStep = steps.find((s) => s.num === activeStep) ?? steps[0]
   const totalSteps = steps.length
+  const CurrentIcon = currentStep.icon
 
   return (
     <div aria-label="Checkout voortgang">
-      {/* Mobile: compact text + progress bar */}
+      {/* Mobile: icon + label + progress bar */}
       <div className="sm:hidden">
-        <div className="flex items-baseline justify-between">
-          <span className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
-            Stap {activeStep} van {totalSteps}
-          </span>
-          <span className="text-[13px] font-semibold uppercase tracking-[0.08em] text-navy-500">
-            {currentStep.label}
-          </span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-full bg-teal-400 text-white">
+              <CurrentIcon className="size-4" strokeWidth={2} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                Stap {activeStep} van {totalSteps}
+              </span>
+              <span className="text-sm font-semibold text-navy-500">
+                {currentStep.label}
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-1">
+            {steps.map((s) => (
+              <span
+                key={s.num}
+                aria-hidden
+                className={cn(
+                  "size-1.5 rounded-full transition-colors",
+                  completedSteps.has(s.num) || activeStep === s.num
+                    ? "bg-teal-400"
+                    : "bg-border"
+                )}
+              />
+            ))}
+          </div>
         </div>
-        <div className="mt-2 h-0.5 w-full bg-border">
+        <div className="mt-3 h-0.5 w-full overflow-hidden bg-border">
           <div
             className="h-full bg-teal-400 transition-all duration-500"
             style={{ width: `${(activeStep / totalSteps) * 100}%` }}
@@ -45,13 +68,14 @@ export function CheckoutStepper({
         </div>
       </div>
 
-      {/* Desktop: labeled stepper */}
+      {/* Desktop: labeled stepper with icons */}
       <ol className="hidden sm:flex sm:items-start">
         {steps.map((step, i) => {
           const isCompleted = completedSteps.has(step.num)
           const isCurrent = activeStep === step.num
           const isLast = i === steps.length - 1
           const canJump = isCompleted && !isCurrent
+          const StepIcon = step.icon
 
           return (
             <li
@@ -64,13 +88,14 @@ export function CheckoutStepper({
                   onClick={canJump ? () => onEdit(step.num) : undefined}
                   disabled={!canJump}
                   aria-current={isCurrent ? "step" : undefined}
+                  aria-label={`${step.label}${isCompleted ? " voltooid" : isCurrent ? " actief" : ""}`}
                   className={cn(
-                    "flex size-8 items-center justify-center rounded-full border text-[12px] font-semibold tabular-nums transition-colors",
+                    "flex size-10 items-center justify-center rounded-full border-2 transition-all duration-300",
                     isCompleted &&
-                      "border-teal-400 bg-teal-400 text-white hover:bg-teal-500 hover:border-teal-500",
+                      "border-teal-400 bg-teal-400 text-white hover:bg-teal-500 hover:border-teal-500 hover:-translate-y-px hover:shadow-sm",
                     isCurrent &&
                       !isCompleted &&
-                      "border-teal-400 bg-white text-teal-500",
+                      "border-teal-400 bg-white text-teal-500 shadow-sm",
                     !isCompleted &&
                       !isCurrent &&
                       "border-border bg-white text-muted-foreground",
@@ -78,9 +103,9 @@ export function CheckoutStepper({
                   )}
                 >
                   {isCompleted ? (
-                    <Check className="size-3.5" strokeWidth={3} />
+                    <Check className="size-4" strokeWidth={2.5} />
                   ) : (
-                    step.num
+                    <StepIcon className="size-4" strokeWidth={2} />
                   )}
                 </button>
                 <span
@@ -100,7 +125,7 @@ export function CheckoutStepper({
               {!isLast && (
                 <div
                   aria-hidden
-                  className="mx-3 mt-4 h-px flex-1 bg-border sm:mx-4"
+                  className="mx-3 mt-5 h-px flex-1 bg-border sm:mx-4"
                 >
                   <div
                     className={cn(

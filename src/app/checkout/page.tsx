@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { Check, Loader2 } from "lucide-react"
+import { Check, CreditCard, Loader2, Mail, MapPin, Truck } from "lucide-react"
+import { motion } from "motion/react"
 
 import { useCart } from "@/lib/context/cart-context"
 import { useAuth } from "@/lib/context/auth-context"
@@ -102,7 +103,16 @@ function StepSection({
       )}
 
       {/* Form content for active step */}
-      {isActive && <div className="mt-6">{children}</div>}
+      {isActive && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="mt-6"
+        >
+          {children}
+        </motion.div>
+      )}
     </div>
   )
 }
@@ -999,10 +1009,10 @@ export default function CheckoutPage() {
               <div className="mt-6">
                 <CheckoutStepper
                   steps={[
-                    { num: 1, label: "E-mail" },
-                    { num: 2, label: "Adres" },
-                    { num: 3, label: "Verzending" },
-                    { num: 4, label: "Betaling" },
+                    { num: 1, label: "E-mail", icon: Mail },
+                    { num: 2, label: "Adres", icon: MapPin },
+                    { num: 3, label: "Verzending", icon: Truck },
+                    { num: 4, label: "Betaling", icon: CreditCard },
                   ]}
                   activeStep={activeStep}
                   completedSteps={completedSteps}
@@ -1352,7 +1362,7 @@ export default function CheckoutPage() {
               {/* Research confirmation + Place Order */}
               {selectedPayment && (
                 <div className="mt-8 space-y-5">
-                  <label className="flex cursor-pointer items-center gap-3 border border-amber-300 bg-amber-50/50 px-4 py-3 transition-colors hover:border-amber-400 focus-within:border-amber-600 focus-within:ring-1 focus-within:ring-amber-600/20">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-teal-200 bg-teal-50/40 px-4 py-3 transition-all duration-300 hover:border-teal-300 hover:bg-teal-50/60 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-400/30 min-h-[44px]">
                     <input
                       type="checkbox"
                       checked={researchConfirmed}
@@ -1361,17 +1371,17 @@ export default function CheckoutPage() {
                     />
                     <div
                       className={cn(
-                        "flex size-4 shrink-0 items-center justify-center border transition-colors",
+                        "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border-2 transition-all duration-300",
                         researchConfirmed
-                          ? "border-amber-600 bg-amber-600"
-                          : "border-amber-300"
+                          ? "border-teal-500 bg-teal-500"
+                          : "border-teal-300 bg-white"
                       )}
                     >
                       {researchConfirmed && (
-                        <Check className="size-3 text-white" strokeWidth={3} />
+                        <Check className="size-3.5 text-white" strokeWidth={3} />
                       )}
                     </div>
-                    <span className="text-sm text-amber-900">
+                    <span className="text-sm text-navy-900">
                       Ik bevestig dat alle producten uitsluitend worden
                       gebruikt voor in-vitro laboratoriumonderzoek en niet
                       voor menselijke of veterinaire consumptie.
