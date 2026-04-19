@@ -359,11 +359,13 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Pre-fill email from cart
+  // Pre-fill email from cart or customer (logged-in)
   useEffect(() => {
-    if (cart?.email && !email) setEmail(cart.email)
+    if (email) return
+    if (cart?.email) setEmail(cart.email)
+    else if (customer?.email) setEmail(customer.email)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cart?.email])
+  }, [cart?.email, customer?.email])
 
   // Pre-fill address from cart
   useEffect(() => {
@@ -1112,7 +1114,12 @@ export default function CheckoutPage() {
                       }}
                       onChooseNew={() => {
                         setSelectedSavedAddressId(null)
-                        setAddress(EMPTY_ADDRESS)
+                        setAddress({
+                          ...EMPTY_ADDRESS,
+                          firstName: customer?.first_name ?? "",
+                          lastName: customer?.last_name ?? "",
+                          phone: customer?.phone ?? "",
+                        })
                       }}
                     />
                   </div>
@@ -1186,7 +1193,12 @@ export default function CheckoutPage() {
                             }}
                             onChooseNew={() => {
                               setBillingSelectedId(null)
-                              setBillingAddress(EMPTY_ADDRESS)
+                              setBillingAddress({
+                                ...EMPTY_ADDRESS,
+                                firstName: customer?.first_name ?? "",
+                                lastName: customer?.last_name ?? "",
+                                phone: customer?.phone ?? "",
+                              })
                             }}
                           />
                         </div>
@@ -1396,7 +1408,7 @@ export default function CheckoutPage() {
                     fullWidth
                     onClick={handlePlaceOrder}
                     disabled={isProcessing || !researchConfirmed}
-                    className="gradient-brand border-0 text-sm font-semibold uppercase tracking-wider text-white shadow-sm transition-all duration-300 hover:-translate-y-px hover:shadow-md disabled:opacity-60"
+                    className="text-sm font-semibold uppercase tracking-wider"
                   >
                     {isProcessing && (
                       <Loader2 className="size-4 animate-spin" />
