@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { FlaskConical, ShoppingCart } from "lucide-react"
+import { FlaskConical, ShoppingCart, BadgeCheck } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useCart } from "@/lib/context/cart-context"
@@ -11,12 +11,24 @@ import { Button } from "@/components/ui/button"
 import type { ProductCardProps } from "@/components/ProductCard"
 
 const statusConfig = {
-  "in-stock": { label: "Op voorraad", dot: "bg-emerald-500" },
-  "out-of-stock": { label: "Uitverkocht", dot: "bg-red-500" },
-  "low-stock": { label: "Beperkt", dot: "bg-amber-500" },
+  "in-stock": {
+    label: "Op voorraad",
+    dot: "bg-emerald-500",
+    pill: "border-emerald-100 bg-emerald-50 text-emerald-700",
+  },
+  "out-of-stock": {
+    label: "Uitverkocht",
+    dot: "bg-red-500",
+    pill: "border-red-100 bg-red-50 text-red-600",
+  },
+  "low-stock": {
+    label: "Beperkt",
+    dot: "bg-amber-500",
+    pill: "border-amber-100 bg-amber-50 text-amber-700",
+  },
 } as const
 
-function CatalogCardInner({
+export function CatalogCard({
   name,
   description,
   price,
@@ -28,12 +40,14 @@ function CatalogCardInner({
   image,
   productId,
   variants = [],
+  href,
   className,
-}: Omit<ProductCardProps, "href" | "bestSeller">) {
+}: Omit<ProductCardProps, "bestSeller">) {
   const router = useRouter()
   const { addItem, isUpdating } = useCart()
   const hasMultipleVariants = variants.length > 1
   const firstVariantId = variants[0]?.id
+  const isOutOfStock = status === "out-of-stock"
 
   async function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault()
@@ -55,34 +69,47 @@ function CatalogCardInner({
 
   return (
     <article
+      aria-label={name}
       className={cn(
-        "group flex flex-col overflow-hidden border border-border bg-white transition-colors hover:border-navy-200",
+        "group relative isolate flex flex-col overflow-hidden border border-border bg-white transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-navy-200 hover:shadow-md",
+        isOutOfStock && "opacity-80",
         className
       )}
     >
-      {/* Image area */}
-      <div className="relative flex h-[180px] items-center justify-center bg-surface-tertiary sm:h-[200px]">
+      {/* Image */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-secondary">
         {image ? (
           <Image
             src={image}
             alt={name}
-            width={240}
-            height={240}
-            className="h-full w-full object-contain p-6"
+            fill
+            sizes="(min-width: 1536px) 22vw, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+            className={cn(
+              "object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.03]",
+              isOutOfStock && "grayscale"
+            )}
           />
         ) : (
-          <FlaskConical className="size-10 text-navy-200" />
+          <div className="flex h-full w-full items-center justify-center">
+            <FlaskConical
+              className="size-10 text-navy-200"
+              aria-hidden="true"
+            />
+          </div>
         )}
 
-        {/* Status indicator */}
-        <div className="absolute left-3 top-3 flex items-center gap-1.5">
+        {/* Status pill */}
+        <div
+          className={cn(
+            "absolute left-3 top-3 inline-flex items-center gap-1.5 border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
+            statusInfo.pill
+          )}
+        >
           <span
             className={cn("block size-1.5", statusInfo.dot)}
             aria-hidden="true"
           />
-          <span className="text-[9px] font-medium uppercase tracking-wider text-navy-400">
-            {statusInfo.label}
-          </span>
+          {statusInfo.label}
         </div>
       </div>
 
@@ -90,58 +117,85 @@ function CatalogCardInner({
       <div className="flex flex-1 flex-col p-4">
         {/* Category */}
         {category && (
-          <p className="text-[9px] font-semibold uppercase tracking-widest text-mauve-500">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-mauve-500">
             {category}
           </p>
         )}
 
-        {/* Title */}
-        <h3 className="mt-1 text-sm font-semibold tracking-tight text-navy-500 transition-colors group-hover:text-teal-400">
-          {name}
+        {/* Title — single anchor covers full card */}
+        <h3 className={cn("font-semibold tracking-tight text-navy-500 text-base", category && "mt-1")}>
+          {href ? (
+            <Link
+              href={href}
+              className="outline-none before:absolute before:inset-0 before:z-0 focus-visible:before:outline-2 focus-visible:before:outline-offset-2 focus-visible:before:outline-teal-400"
+            >
+              {name}
+            </Link>
+          ) : (
+            name
+          )}
         </h3>
 
-        {/* Description */}
-        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-          {description}
-        </p>
-
-        {/* Divider */}
-        <div className="mt-3 border-t border-border" />
-
-        {/* Specs row */}
-        <div className="mt-3 flex items-center gap-3 text-[10px]">
-          {purity > 0 && (
-            <span className="flex items-center gap-1 font-medium text-navy-500">
-              <span
-                className="block size-1.5 bg-teal-400"
-                aria-hidden="true"
-              />
-              &ge;{purity}%
+        {/* Primary metadata — dosage + purity directly under title */}
+        <div className="mt-1 flex items-baseline gap-2 text-xs text-navy-400">
+          {dosage && (
+            <span className="font-medium tabular-nums text-navy-500">
+              {dosage}
             </span>
           )}
-          {dosage && (
-            <span className="text-muted-foreground">{dosage}</span>
+          {dosage && purity > 0 && (
+            <span className="text-border" aria-hidden="true">
+              |
+            </span>
+          )}
+          {purity > 0 && (
+            <span className="tabular-nums">&ge;{purity}% zuiverheid</span>
           )}
         </div>
 
+        {/* Description */}
+        <p className="mt-2 line-clamp-2 min-h-[2rem] text-xs leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+
+        {/* Trust signals */}
+        <div className="mt-3 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-navy-400">
+          <BadgeCheck
+            className="size-3 text-teal-400"
+            aria-hidden="true"
+          />
+          HPLC getest
+          <span className="text-border" aria-hidden="true">
+            ·
+          </span>
+          EU verzending
+        </div>
+
         {/* Price + CTA */}
-        <div className="mt-auto flex items-end justify-between gap-2 pt-4">
-          <div>
-            <span className="text-lg font-bold tracking-tight text-navy-500">
-              {currency}
-              {formattedPrice}
-            </span>
-            <p className="text-[9px] text-muted-foreground">Incl. BTW</p>
+        <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+          <div className="min-w-0">
+            <div className="flex items-baseline gap-0.5 tabular-nums">
+              <span className="text-sm font-medium text-navy-400">
+                {currency}
+              </span>
+              <span className="text-xl font-bold tracking-tight text-navy-500">
+                {formattedPrice}
+              </span>
+            </div>
+            <p className="text-[9px] uppercase tracking-wider text-muted-foreground">
+              Incl. BTW
+            </p>
           </div>
           <Button
             variant="primary"
             size="sm"
-            disabled={status === "out-of-stock" || isUpdating}
+            className="relative z-10"
+            disabled={isOutOfStock || isUpdating}
             onClick={handleAddToCart}
             aria-label={`${name} toevoegen aan winkelwagen`}
           >
             <ShoppingCart className="size-3.5" />
-            {status === "out-of-stock"
+            {isOutOfStock
               ? "Uitverkocht"
               : isUpdating
                 ? "..."
@@ -153,18 +207,4 @@ function CatalogCardInner({
       </div>
     </article>
   )
-}
-
-export function CatalogCard({ href, bestSeller: _, ...props }: ProductCardProps) {
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
-      >
-        <CatalogCardInner {...props} />
-      </Link>
-    )
-  }
-  return <CatalogCardInner {...props} />
 }

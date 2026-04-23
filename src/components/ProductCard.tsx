@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { FlaskConical, ShoppingCart } from "lucide-react"
+import { FlaskConical, ShoppingCart, BadgeCheck } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useCart } from "@/lib/context/cart-context"
@@ -33,7 +33,7 @@ export interface ProductCardProps {
   className?: string
 }
 
-function ProductCardInner({
+export function ProductCard({
   name,
   description,
   price,
@@ -47,13 +47,16 @@ function ProductCardInner({
   variants = [],
   href,
   className,
-}: Omit<ProductCardProps, "category">) {
+}: ProductCardProps) {
   const router = useRouter()
   const { addItem, isUpdating } = useCart()
   const hasMultipleVariants = variants.length > 1
   const firstVariantId = variants[0]?.id
+  const isOutOfStock = status === "out-of-stock"
 
-  async function handleAddToCart() {
+  async function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
     if (hasMultipleVariants) {
       router.push(`/products/${productId}`)
       return
@@ -68,118 +71,131 @@ function ProductCardInner({
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(price)
-  const refCode = `${name.replace(/[^A-Z0-9]/gi, "").slice(0, 2).toUpperCase()}-${String(Math.abs(hashCode(name)) % 1000).padStart(3, "0")}`
 
   return (
     <article
+      aria-label={name}
       className={cn(
-        "group relative flex flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "group relative isolate flex flex-col overflow-hidden border border-border bg-card transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-navy-200 hover:shadow-md",
+        isOutOfStock && "opacity-80",
         className
       )}
     >
-      {/* Badge row — single status badge only */}
-      <div className="flex items-center gap-1.5 px-4 pt-4 sm:px-5 sm:pt-5">
-        {bestSeller && (
-          <Badge variant="bestSeller" size="sm">
-            Best Seller
-          </Badge>
-        )}
-        <Badge variant={statusInfo.variant} size="sm">
-          {statusInfo.label}
-        </Badge>
-      </div>
-
-      {/* Product image */}
-      <div className="mx-4 mt-3 flex h-[200px] items-center justify-center overflow-hidden bg-surface-secondary sm:mx-5 sm:h-[220px]">
+      {/* Image */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-secondary">
         {image ? (
           <Image
             src={image}
             alt={name}
-            width={240}
-            height={240}
-            className="h-full w-full object-contain p-4"
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className={cn(
+              "object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.03]",
+              isOutOfStock && "grayscale"
+            )}
           />
         ) : (
-          <FlaskConical className="size-12 text-muted-foreground/30" />
+          <div className="flex h-full w-full items-center justify-center">
+            <FlaskConical
+              className="size-12 text-navy-200"
+              aria-hidden="true"
+            />
+          </div>
         )}
+
+        {/* Status + bestSeller pills */}
+        <div className="absolute left-4 top-4 flex items-center gap-1.5">
+          <Badge variant={statusInfo.variant} size="sm">
+            {statusInfo.label}
+          </Badge>
+          {bestSeller && (
+            <Badge variant="bestSeller" size="sm">
+              Best Seller
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col px-4 pt-3 sm:px-5 sm:pt-4">
-        <div className="flex items-baseline justify-between gap-2">
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="text-lg font-semibold tracking-tight text-navy-500">
           {href ? (
             <Link
               href={href}
-              className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 before:absolute before:inset-0 before:z-0"
+              className="outline-none before:absolute before:inset-0 before:z-0 focus-visible:before:outline-2 focus-visible:before:outline-offset-2 focus-visible:before:outline-teal-400"
             >
-              <h3 className="text-base font-semibold tracking-tight text-navy-500 sm:text-lg">
-                {name}
-              </h3>
+              {name}
             </Link>
           ) : (
-            <h3 className="text-base font-semibold tracking-tight text-navy-500 sm:text-lg">
-              {name}
-            </h3>
+            name
           )}
-          <span className="shrink-0 font-mono text-[10px] tracking-wide text-muted-foreground">
-            {refCode}
-          </span>
+        </h3>
+
+        {/* Primary metadata */}
+        <div className="mt-1.5 flex items-baseline gap-2 text-xs text-navy-400">
+          {dosage && (
+            <span className="font-medium tabular-nums text-navy-500">
+              {dosage}
+            </span>
+          )}
+          {dosage && purity > 0 && (
+            <span className="text-border" aria-hidden="true">
+              |
+            </span>
+          )}
+          {purity > 0 && (
+            <span className="tabular-nums">&ge;{purity}% zuiverheid</span>
+          )}
         </div>
-        <p className="mt-1 min-h-[2.5rem] line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+
+        {/* Description */}
+        <p className="mt-3 line-clamp-2 min-h-[2.5rem] text-sm leading-relaxed text-muted-foreground">
           {description}
         </p>
-      </div>
 
-      {/* Key-value pairs */}
-      <div className="mx-4 mt-4 space-y-0 border-t border-border sm:mx-5 sm:mt-5">
-        <div className="flex items-center justify-between border-b border-dashed border-border py-2">
-          <span className="text-xs text-muted-foreground">Zuiverheid</span>
-          <span className="text-sm font-medium text-teal-400">
-            {purity}%
+        {/* Trust signals */}
+        <div className="mt-4 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-navy-400">
+          <BadgeCheck
+            className="size-3.5 text-teal-400"
+            aria-hidden="true"
+          />
+          HPLC getest
+          <span className="text-border" aria-hidden="true">
+            ·
           </span>
+          EU verzending
         </div>
-        <div className="flex items-center justify-between py-2">
-          <span className="text-xs text-muted-foreground">Formaat</span>
-          <span className="text-sm font-medium text-navy-500">{dosage}</span>
-        </div>
-      </div>
 
-      {/* Footer: price + add to cart */}
-      <div className="relative z-10 mt-auto flex flex-col gap-3 px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
-        <span className="text-xl font-bold tracking-tight text-navy-500">
-          {currency}{formattedPrice}
-        </span>
-        <Button
-          variant="primary"
-          size="md"
-          fullWidth
-          disabled={status === "out-of-stock" || isUpdating}
-          onClick={handleAddToCart}
-          aria-label={`${name} toevoegen aan winkelwagen`}
-        >
-          <ShoppingCart className="size-4" />
-          {status === "out-of-stock"
-            ? "Niet beschikbaar"
-            : isUpdating
-              ? "Toevoegen..."
-              : hasMultipleVariants
-                ? "Kies variant"
-                : "Toevoegen"}
-        </Button>
+        {/* Price + CTA */}
+        <div className="mt-auto pt-5">
+          <div className="flex items-baseline gap-1 tabular-nums">
+            <span className="text-sm font-medium text-navy-400">
+              {currency}
+            </span>
+            <span className="text-2xl font-bold tracking-tight text-navy-500">
+              {formattedPrice}
+            </span>
+          </div>
+          <Button
+            variant="primary"
+            size="md"
+            fullWidth
+            className="relative z-10 mt-3"
+            disabled={isOutOfStock || isUpdating}
+            onClick={handleAddToCart}
+            aria-label={`${name} toevoegen aan winkelwagen`}
+          >
+            <ShoppingCart className="size-4" />
+            {isOutOfStock
+              ? "Niet beschikbaar"
+              : isUpdating
+                ? "Toevoegen..."
+                : hasMultipleVariants
+                  ? "Kies variant"
+                  : "Toevoegen"}
+          </Button>
+        </div>
       </div>
     </article>
   )
-}
-
-export function ProductCard({ category: _, ...props }: ProductCardProps) {
-  return <ProductCardInner {...props} />
-}
-
-function hashCode(str: string): number {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i)
-    hash |= 0
-  }
-  return hash
 }

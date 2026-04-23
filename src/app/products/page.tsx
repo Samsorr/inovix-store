@@ -69,7 +69,7 @@ export default async function ProductsPage() {
   const categories = Array.from(categorySet).sort()
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-7xl px-4 pt-6 pb-16 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24">
       {/* Breadcrumbs */}
       <nav
         aria-label="Breadcrumb"
