@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 const productLinks = [
   { label: "Peptiden", href: "/products" },
@@ -54,11 +55,14 @@ export function Footer() {
         <div className="grid gap-8 grid-cols-2 sm:gap-10 lg:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2 lg:col-span-1">
-            <Link
-              href="/"
-              className="text-lg font-bold tracking-wider text-white"
-            >
-              INOVIX
+            <Link href="/" aria-label="Inovix home" className="inline-flex items-center">
+              <Image
+                src="/images/inovix-logo.png"
+                alt="Inovix"
+                width={166}
+                height={28}
+                className="h-6 w-auto brightness-0 invert sm:h-7"
+              />
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/60">
               Premium peptiden voor wetenschappelijk laboratoriumonderzoek.

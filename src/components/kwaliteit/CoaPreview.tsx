@@ -1,3 +1,5 @@
+import Image from "next/image"
+
 export function CoaPreview() {
   return (
     <div className="relative">
@@ -25,9 +27,13 @@ export function CoaPreview() {
       <div className="border border-border bg-white">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border bg-navy-500 px-4 py-4 sm:px-6 sm:py-5">
-          <span className="text-[15px] font-bold tracking-[0.02em] text-white">
-            INOVIX
-          </span>
+          <Image
+            src="/images/inovix-logo.png"
+            alt="Inovix"
+            width={118}
+            height={20}
+            className="h-5 w-auto brightness-0 invert"
+          />
           <span className="border border-teal-400/40 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.06em] text-teal-400">
             Certificate of Analysis
           </span>
