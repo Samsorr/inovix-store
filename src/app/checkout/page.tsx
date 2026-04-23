@@ -1011,6 +1011,18 @@ export default function CheckoutPage() {
                 </span>
               </p>
             )}
+            {!customer && guestChoiceMade && (
+              <p className="text-[12px] text-muted-foreground">
+                Afrekenen als gast ·{" "}
+                <button
+                  type="button"
+                  onClick={() => setGuestChoiceMade(false)}
+                  className="font-medium text-navy-500 underline underline-offset-4 decoration-border hover:decoration-navy-500"
+                >
+                  Toch inloggen
+                </button>
+              </p>
+            )}
           </div>
 
           {!customer && !guestChoiceMade && (
