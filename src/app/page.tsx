@@ -13,21 +13,20 @@ import {
   Brain,
   Activity,
   BadgeCheck,
-  FileText,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { GradientSection } from "@/components/GradientSection"
 import { SectionHeader } from "@/components/SectionHeader"
 import { ProductCard } from "@/components/ProductCard"
 import { ScrollReveal } from "@/components/ScrollReveal"
 import { Navbar } from "@/components/Navbar"
 import { HideDefaultNavbar } from "@/components/HideDefaultNavbar"
+import { CoaIllustration } from "@/components/CoaIllustration"
 import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
 import { centsToEuros } from "@/lib/price"
+import { formatPostDate, getAllPosts } from "@/lib/blog"
 
 /* ─── Trust badge inline (matching Stitch: icon + title + description, separated by lines) ─── */
 
@@ -75,6 +74,7 @@ async function getFeaturedProducts() {
 
 export default async function HomePage() {
   const featuredProducts = await getFeaturedProducts()
+  const latestPosts = getAllPosts().slice(0, 2)
   return (
     <>
       {/* ══════════════════════════════════════════
@@ -217,36 +217,45 @@ export default async function HomePage() {
             action={{ label: "Toon alle peptiden", href: "/products" }}
           />
         </ScrollReveal>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredProducts.map((product, index) => {
-            const variant = product.variants?.[0]
-            const price = variant?.calculated_price?.calculated_amount
-            const metadata = product.metadata as Record<string, unknown> | null
-            const inventoryQty = (variant as unknown as { inventory_quantity?: number })?.inventory_quantity
-            const status = inventoryQty != null && inventoryQty <= 0
-              ? "out-of-stock"
-              : inventoryQty != null && inventoryQty <= 10
-                ? "low-stock"
-                : "in-stock"
+        {featuredProducts.length > 0 ? (
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProducts.map((product, index) => {
+              const variant = product.variants?.[0]
+              const price = variant?.calculated_price?.calculated_amount
+              const metadata = product.metadata as Record<string, unknown> | null
+              const inventoryQty = (variant as unknown as { inventory_quantity?: number })?.inventory_quantity
+              const status = inventoryQty != null && inventoryQty <= 0
+                ? "out-of-stock"
+                : inventoryQty != null && inventoryQty <= 10
+                  ? "low-stock"
+                  : "in-stock"
 
-            return (
-              <ScrollReveal key={product.id} delay={index * 0.1}>
-                <ProductCard
-                  name={product.title ?? ""}
-                  description={product.description ?? ""}
-                  price={price != null ? centsToEuros(price) : 0}
-                  dosage={product.subtitle ?? ""}
-                  purity={Number(metadata?.purity) || 0}
-                  status={status}
-                  image={product.thumbnail || "/images/product-peptide.png"}
-                  productId={product.id}
-                  variants={(product.variants ?? []).map((v) => ({ id: v.id }))}
-                  href={`/products/${product.id}`}
-                />
-              </ScrollReveal>
-            )
-          })}
-        </div>
+              return (
+                <ScrollReveal key={product.id} delay={index * 0.1}>
+                  <ProductCard
+                    name={product.title ?? ""}
+                    description={product.description ?? ""}
+                    price={price != null ? centsToEuros(price) : 0}
+                    dosage={product.subtitle ?? ""}
+                    purity={Number(metadata?.purity) || 0}
+                    status={status}
+                    image={product.thumbnail || "/images/product-peptide.png"}
+                    productId={product.id}
+                    variants={(product.variants ?? []).map((v) => ({ id: v.id }))}
+                    href={`/products/${product.id}`}
+                  />
+                </ScrollReveal>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="mt-8 border border-border bg-surface-secondary p-10 text-center">
+            <p className="text-sm text-muted-foreground">Onze catalogus wordt bijgewerkt.</p>
+            <Link href="/products" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-teal-400 hover:text-teal-500">
+              Bekijk de volledige collectie <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* ══════════════════════════════════════════
@@ -323,15 +332,16 @@ export default async function HomePage() {
           KWALITEIT & ANALYSE — testing methods + COA preview
       ══════════════════════════════════════════ */}
       <section className="section-y mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <SectionHeader
-            title="Analytische Kwaliteitsborging"
-            subtitle="Transparantie in elke stap, van synthese tot levering"
-          />
-        </ScrollReveal>
-        <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:items-center">
-          {/* Left — testing methods */}
-          <div className="flex flex-col gap-6">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-20">
+          {/* Left — heading + testing methods as one block */}
+          <div className="flex flex-col gap-8 lg:max-w-md">
+            <ScrollReveal>
+              <SectionHeader
+                title="Analytische Kwaliteitsborging"
+                subtitle="Transparantie in elke stap, van synthese tot levering"
+              />
+            </ScrollReveal>
+            <div className="flex flex-col gap-6">
             {[
               {
                 icon: FlaskConical,
@@ -366,28 +376,27 @@ export default async function HomePage() {
                 </div>
               </ScrollReveal>
             ))}
-          </div>
 
-          {/* Right — COA placeholder */}
-          <ScrollReveal delay={0.15}>
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex w-full flex-col items-center justify-center border border-border bg-surface-50 px-8 py-16">
-                <FileText className="size-12 text-navy-200" />
-                <p className="mt-3 text-sm font-semibold text-navy-500">
-                  Certificate of Analysis
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Voorbeeld analysecertificaat
-                </p>
-              </div>
+            <ScrollReveal delay={0.4}>
               <Link
                 href="/kwaliteit"
-                className="group inline-flex items-center gap-1 text-sm font-medium text-teal-400 transition-colors hover:text-teal-500"
+                className="group mt-2 inline-flex items-center gap-1 self-start text-sm font-medium text-teal-400 transition-colors hover:text-teal-500"
               >
                 Bekijk alle analysecertificaten
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
+            </ScrollReveal>
             </div>
+          </div>
+
+          {/* Right — COA illustration */}
+          <ScrollReveal delay={0.15}>
+            <figure className="mx-auto flex w-full max-w-[340px] flex-col items-center gap-3 sm:max-w-[400px]">
+              <CoaIllustration className="h-auto w-full" />
+              <figcaption className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+                Voorbeeld analysecertificaat
+              </figcaption>
+            </figure>
           </ScrollReveal>
         </div>
       </section>
@@ -409,95 +418,57 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════
-          ONDERZOEK & KENNISBANK — horizontal article cards
+          ONDERZOEKSNOTITIES — latest blog posts
       ══════════════════════════════════════════ */}
-      <section className="section-y mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <SectionHeader
-            title="Onderzoek & Kennisbank"
-            subtitle="Wetenschappelijke inzichten en klinische updates over de toepassingen van peptide verbindingen in de moderne biologie."
-            centered
-          />
-        </ScrollReveal>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2">
-          {/* Article 1 */}
-          <ScrollReveal delay={0.1}>
-          <Link
-            href="/publicaties/bpc-157-inflammatoire-darmziekten"
-            className="group flex h-full flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-start"
-          >
-            <div className="relative h-40 w-full shrink-0 overflow-hidden sm:h-auto sm:w-28 sm:self-stretch">
-              <Image
-                src="https://images.unsplash.com/photo-1579165466741-7f35e4755660?w=400&q=80"
-                alt="BPC-157 onderzoek"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="flex flex-1 flex-col p-4 sm:p-5">
-              <div className="flex items-center gap-2">
-                <Badge variant="category" size="sm">
-                  Publicatie
-                </Badge>
-                <span className="text-xs text-muted-foreground">
-                  12 Min Leestijd
-                </span>
-              </div>
-              <h3 className="mt-2.5 text-base font-semibold leading-snug text-navy-500">
-                De impact van BPC-157 op inflammatoire darmziekten in
-                muismodellen.
-              </h3>
-              <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                Een overzicht van recente Europese studies naar de
-                herstellende werking van stabiele gastrische peptiden.
-              </p>
-              <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-teal-400 transition-colors group-hover:text-teal-500">
-                Lees meer
-                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </Link>
+      {latestPosts.length > 0 && (
+        <section className="section-y mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <SectionHeader
+              title="Onderzoeksnotities"
+              subtitle="Beknopte, onderbouwde notities over het werken met peptiden in een onderzoekscontext."
+              centered
+            />
           </ScrollReveal>
-
-          {/* Article 2 */}
-          <ScrollReveal delay={0.2}>
-          <Link
-            href="/publicaties/opslag-gelyofiliseerde-peptiden"
-            className="group flex h-full flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-start"
-          >
-            <div className="relative h-40 w-full shrink-0 overflow-hidden sm:h-auto sm:w-28 sm:self-stretch">
-              <Image
-                src="https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&q=80"
-                alt="Peptide opslag protocol"
-                fill
-                className="object-cover"
-              />
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            {latestPosts.map((post, index) => (
+              <ScrollReveal key={post.slug} delay={index * 0.1}>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="group flex h-full flex-col border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md sm:p-7"
+                >
+                  <time
+                    dateTime={post.date}
+                    className="text-xs tabular-nums text-navy-400"
+                  >
+                    {formatPostDate(post.date)}
+                  </time>
+                  <h3 className="mt-3 text-lg font-semibold leading-snug text-navy-900 transition-colors group-hover:text-teal-400 sm:text-xl">
+                    {post.title}
+                  </h3>
+                  <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                    {post.excerpt}
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-teal-400 transition-colors group-hover:text-teal-500">
+                    Lees verder
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                </Link>
+              </ScrollReveal>
+            ))}
+          </div>
+          <ScrollReveal>
+            <div className="mt-10 text-center">
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-teal-400 transition-colors hover:text-teal-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-400"
+              >
+                Bekijk alle onderzoeksnotities
+                <ArrowRight className="size-3.5" aria-hidden />
+              </Link>
             </div>
-            <div className="flex flex-1 flex-col p-4 sm:p-5">
-              <div className="flex items-center gap-2">
-                <Badge variant="purity" size="sm">
-                  Protocol
-                </Badge>
-                <span className="text-xs text-muted-foreground">
-                  8 Min Leestijd
-                </span>
-              </div>
-              <h3 className="mt-2.5 text-base font-semibold leading-snug text-navy-500">
-                Optimale opslagcondities voor gelyofiliseerde peptiden.
-              </h3>
-              <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                Het belang van temperatuurregeling en lichtexpositie voor het
-                behoud van peptide-integriteit.
-              </p>
-              <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-teal-400 transition-colors group-hover:text-teal-500">
-                Lees meer
-                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </Link>
           </ScrollReveal>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ══════════════════════════════════════════
           NEWSLETTER CTA — gradient
@@ -509,25 +480,15 @@ export default async function HomePage() {
             Blijf op de hoogte
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/70 md:text-base">
-            Ontvang exclusieve updates over nieuwe compounds, publicaties en
-            wetenschappelijke doorbraken direct in uw inbox.
+            Onze nieuwsbrief komt binnenkort beschikbaar. Heeft u nu een vraag? Neem gerust contact met ons op.
           </p>
-          <div className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:mt-8 sm:flex-row">
-            <div className="flex-1">
-              <Input
-                type="email"
-                placeholder="Uw zakelijke e-mailadres"
-                className="h-12 border-white/25 bg-white/15 text-white backdrop-blur-sm placeholder:text-white/50 focus:border-teal-300/60 focus:ring-teal-300/20"
-              />
-            </div>
-            <Button variant="primaryOnDark" size="lg" className="w-full sm:w-auto">
-              Aanmelden
-            </Button>
+          <div className="mt-6 flex justify-center sm:mt-8">
+            <Link href="/contact">
+              <Button variant="primaryOnDark" size="lg">
+                Neem contact op
+              </Button>
+            </Link>
           </div>
-          <p className="mt-4 text-xs text-white/40">
-            Door aan te melden gaat u akkoord met onze Privacy Policy en
-            ontvangt u uitsluitend onderzoeksgerelateerde content.
-          </p>
         </div>
       </GradientSection>
       </ScrollReveal>

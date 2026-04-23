@@ -1,0 +1,87 @@
+---
+title: "Een Certificate of Analysis lezen: wat elk veld u vertelt"
+date: "2026-04-23"
+excerpt: "Welke velden op een CoA u moet controleren voordat u een peptide in een experiment inzet: identiteit via massa-spectrometrie, zuiverheid via HPLC, tegenionen, watergehalte en de vaak vergeten net peptide content."
+---
+
+Een Certificate of Analysis (CoA) is de analytische handtekening van een batch. Het document vertelt u niet alleen of de peptide zuiver is, maar ook hoeveel peptide er daadwerkelijk in de vial zit, welke tegenionen eraan gebonden zijn en welke vrijheidsgraden u heeft bij dosering. Dit artikel loopt de belangrijkste velden na, met de nadruk op wat een onderzoeker ermee moet kunnen.
+
+De richtlijnen hieronder gelden voor onderzoekspeptiden. De inhoud is uitsluitend bedoeld voor wetenschappelijk gebruik in laboratoriumcontext.
+
+## Identiteit: massa-spectrometrie
+
+De eerste vraag bij elke batch is niet hoe zuiver het product is, maar of het überhaupt het juiste molecuul is. Een HPLC-chromatogram met één scherpe piek zegt niets als die piek hoort bij een sequentie waarin een aminozuur ontbreekt.
+
+Hiervoor is massa-spectrometrie bedoeld. Bachem beschrijft het kort: het moleculair gewicht wordt bepaald met massa-spectrometrie [1]. Op een CoA verwacht u de theoretische monoisotopische massa naast de gemeten massa. Een verschil binnen ongeveer ±1 Da is voor de meeste peptiden acceptabel. Grotere afwijkingen wijzen op adducten (bijvoorbeeld natrium), oxidatieve modificaties of synthesefouten, en verdienen navraag bij de leverancier voordat u de batch in gebruik neemt.
+
+## Zuiverheid: analytische HPLC
+
+Zodra de identiteit klopt, volgt de zuiverheidsmeting. De standaardmethode voor peptiden is analytische high-performance liquid chromatography, meestal in reverse-phase configuratie [1]. De zuiverheid wordt uitgedrukt als percentage van het hoofdpiekoppervlak ten opzichte van het totale piekoppervlak bij een gekozen detectiegolflengte (doorgaans 220 nm).
+
+Voor onderzoekspeptiden is ≥98% de gangbare drempel die u bij Inovix op elke batch terugziet. Wat een HPLC-percentage niet zegt:
+
+- welke aard de onzuiverheden hebben (deletiesequenties, modificaties, afbraakproducten);
+- of niet-peptidische bestanddelen aanwezig zijn (water, zouten, tegenionen) | die vallen buiten de UV-detectie;
+- of de peptide over de hele sequentie het juiste aminozuurprofiel heeft.
+
+HPLC-zuiverheid en massa-spectrometrie zijn daarom complementair. Pas met beide bevestigt u wat in de vial zit.
+
+## Tegenionen: TFA en acetaat
+
+Synthetische peptiden worden gemaakt met trifluorazijnzuur (TFA) in de afsplitsingsstap. Het gevolg is dat het eindproduct typisch als TFA-zout geleverd wordt, waarbij de TFA-anionen gebonden zijn aan de vrije N-terminus en basische zijketens [1].
+
+TFA is voor veel in-vitro experimenten geen bezwaar, maar de PMC-overzichtspublicatie over tegenionen wijst op twee bekende haken: TFA kan fysicochemische karakterisering verstoren en invloed hebben op celcultuur-experimenten [2]. Voor sequenties waarvoor dit relevant is, wordt het TFA-zout uitgewisseld voor bijvoorbeeld acetaat of hydrochloride. Welke vorm u heeft, staat expliciet op de CoA.
+
+Waarom is dit belangrijk? Omdat het tegenion bijdraagt aan het gewicht dat u in de vial afweegt. Een peptide met moleculair gewicht 1000 en twee TFA-ionen weegt bruto 1228, terwijl slechts 1000 daarvan peptide is.
+
+## Net peptide content
+
+Hier komt het veld dat in de dagelijkse praktijk het vaakst over het hoofd gezien wordt. Een peptide kan 99% zuiver zijn op HPLC en toch maar 75% van het gewicht in de vial uitmaken, omdat het restant bestaat uit water en tegenionen [1].
+
+Het theoretische net peptide content wordt berekend als:
+
+```
+(peptide MW) / (peptide MW + aantal gebonden zouten × zout MW)
+```
+
+Voor een peptide met moleculair gewicht 1000 en twee gebonden TFA-ionen (MW = 114 elk):
+
+```
+1000 / (1000 + 2 × 114) = 1000 / 1228 = 81%
+```
+
+AmbioPharm verduidelijkt dat deze berekening enkel rekening houdt met tegenionen en dat het werkelijke peptide content typisch óók rest-water en rest-oplosmiddelen omvat. Voor een exacte waarde zijn elementair of kwantitatieve aminozuur-analyse (AAA) vereist [3]. Als u dus 5 mg peptide nodig heeft voor een experiment, leest u op de CoA eerst de net peptide content af, en weegt u de bruto hoeveelheid uit die bij uw gewenste netto-massa hoort. Zonder die correctie onderdoseert u systematisch.
+
+## Water en overige velden
+
+Het watergehalte wordt bepaald met Karl Fischer-titratie [1]. Typische waarden voor een goed gelyofiliseerd peptide liggen in het bereik van enkele procenten. Sterk verhoogde waarden wijzen op slechte lyofilisatie of vochtopname tijdens opslag, en beïnvloeden zowel stabiliteit als de netto massa per gewogen milligram.
+
+Andere velden die u standaard op een CoA verwacht:
+
+- batchnummer en productiedatum;
+- theoretische en gemeten molecuulformule;
+- uiterlijk (typisch "witte tot gebroken witte poeder");
+- aanbevolen opslagcondities;
+- retest- of houdbaarheidsdatum.
+
+## Wat een bruikbare CoA minimaal bevat
+
+1. Naam, sequentie (één-letter en drie-letter notatie) en molecuulformule.
+2. Theoretische en gemeten massa (ESI- of MALDI-MS).
+3. HPLC-zuiverheid met kolom, gradiënt en detectiegolflengte.
+4. Tegenion en vorm (TFA, acetaat, HCl).
+5. Watergehalte (Karl Fischer).
+6. Net peptide content (theoretisch of via AAA).
+7. Batchnummer, productiedatum, opslagadvies.
+
+Ontbreekt één van deze velden, vraag er dan om voordat u de batch in een experiment inzet. Een goede leverancier levert dit standaard, per batch, zonder meerprijs.
+
+<section className="references">
+
+## Referenties
+
+1. Bachem. [Quality Control of Amino Acids and Peptides](https://www.bachem.com/knowledge-center/peptide-guide/quality-control-of-amino-acids-and-peptides/). Peptide Guide.
+2. Cárdenas-Martínez KJ, et al. [The Role of Counter-Ions in Peptides: An Overview](https://pmc.ncbi.nlm.nih.gov/articles/PMC7761850/). Pharmaceuticals, 2020.
+3. AmbioPharm. [How is Theoretical Net Peptide Content Calculated?](https://www.ambiopharm.com/faq/how-is-theoretical-net-peptide-content-calculated/)
+
+</section>

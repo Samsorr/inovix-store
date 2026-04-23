@@ -967,9 +967,8 @@ export default function CheckoutPage() {
   if (!cart || !cart.items?.length) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4">
-        <p className="text-sm text-muted-foreground">
-          Uw winkelwagen is leeg.
-        </p>
+        <h1 className="text-lg font-semibold text-navy-500">Uw winkelwagen is leeg</h1>
+        <p className="text-sm text-muted-foreground text-center max-w-sm">Uw sessie is mogelijk verlopen of u heeft nog geen producten toegevoegd.</p>
         <Button
           variant="secondary"
           size="md"
@@ -1052,7 +1051,7 @@ export default function CheckoutPage() {
 
               {/* Global error */}
               {globalError && (
-                <div className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
+                <div role="alert" className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
                   {globalError}
                 </div>
               )}

@@ -55,7 +55,7 @@ export function ProductActions({
           <div className="text-[28px] font-bold leading-none text-navy-500">
             {price != null ? formatPrice(price) : "Prijs op aanvraag"}
           </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground">
             Incl. BTW · Gratis verzending vanaf €100
           </p>
         </div>
@@ -63,7 +63,7 @@ export function ProductActions({
         {/* Variant selector — only if multiple variants */}
         {variants.length > 1 && (
           <div>
-            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Hoeveelheid
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -97,7 +97,7 @@ export function ProductActions({
           <div className="flex items-center self-start border border-border sm:self-auto">
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="px-3 py-3 text-muted-foreground transition-colors hover:text-navy-500"
+              className="px-4 py-3.5 text-muted-foreground transition-colors hover:text-navy-500"
               aria-label="Verminder aantal"
             >
               <Minus className="size-3.5" />
@@ -107,7 +107,7 @@ export function ProductActions({
             </span>
             <button
               onClick={() => setQuantity((q) => q + 1)}
-              className="px-3 py-3 text-muted-foreground transition-colors hover:text-navy-500"
+              className="px-4 py-3.5 text-muted-foreground transition-colors hover:text-navy-500"
               aria-label="Verhoog aantal"
             >
               <Plus className="size-3.5" />
@@ -118,7 +118,7 @@ export function ProductActions({
           <button
             disabled={!selectedVariantId || isUpdating}
             onClick={handleAddToCart}
-            className="flex flex-1 items-center justify-center gap-2 bg-teal-400 px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-white transition-colors hover:bg-teal-300 disabled:cursor-not-allowed disabled:opacity-50 sm:px-6"
+            className="flex flex-1 items-center justify-center gap-2 bg-teal-400 px-4 py-3.5 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-teal-300 disabled:cursor-not-allowed disabled:opacity-50 sm:px-6"
           >
             <ShoppingCart className="size-4 shrink-0" />
             <span className="truncate">
@@ -135,7 +135,7 @@ export function ProductActions({
         {coaUrl && (
           <a
             href={`/api/products/${productId}/coa`}
-            className="inline-flex items-center gap-1.5 text-[11px] font-medium text-mauve-500 transition-colors hover:text-mauve-400"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-mauve-500 transition-colors hover:text-mauve-400"
           >
             <Download className="size-3.5" />
             Download Certificaat van Analyse (CoA)
@@ -147,7 +147,7 @@ export function ProductActions({
 
         {/* Research confirmation — amber warning */}
         <div className="border border-amber-200 bg-amber-50 px-3 py-2.5">
-          <p className="flex items-start gap-2 text-[10px] leading-relaxed text-amber-800">
+          <p className="flex items-start gap-2 text-xs leading-relaxed text-amber-800">
             <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-amber-600" />
             Door dit product te bestellen bevestigt u dat u een gekwalificeerde
             onderzoeker bent en het uitsluitend voor laboratoriumonderzoek zult

@@ -1,10 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useSyncExternalStore } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/lib/context/cart-context"
 import { formatPrice } from "@/lib/price"
+import {
+  COOKIE_CONSENT_KEY,
+  COOKIE_CONSENT_EVENT,
+} from "@/lib/cookie-consent"
 
 interface StickyCartBarProps {
   productTitle: string
@@ -13,6 +17,28 @@ interface StickyCartBarProps {
   selectedVariantTitle: string | null
   selectedPrice: number | null
   ctaRef: React.RefObject<HTMLDivElement | null>
+}
+
+function subscribeToConsent(callback: () => void) {
+  if (typeof window === "undefined") return () => {}
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === COOKIE_CONSENT_KEY) callback()
+  }
+  window.addEventListener(COOKIE_CONSENT_EVENT, callback)
+  window.addEventListener("storage", onStorage)
+  return () => {
+    window.removeEventListener(COOKIE_CONSENT_EVENT, callback)
+    window.removeEventListener("storage", onStorage)
+  }
+}
+
+function getClientConsentRaw(): string | null {
+  if (typeof window === "undefined") return null
+  return window.localStorage.getItem(COOKIE_CONSENT_KEY)
+}
+
+function getServerConsentRaw(): string | null {
+  return null
 }
 
 export function StickyCartBar({
@@ -25,6 +51,24 @@ export function StickyCartBar({
 }: StickyCartBarProps) {
   const { addItem, isUpdating } = useCart()
   const [isVisible, setIsVisible] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  const rawConsent = useSyncExternalStore(
+    subscribeToConsent,
+    getClientConsentRaw,
+    getServerConsentRaw
+  )
+  const consentPending = rawConsent === null
+
+  useEffect(() => {
+    setMounted(true)
+    const mql = window.matchMedia("(max-width: 639px)")
+    const update = () => setIsMobile(mql.matches)
+    update()
+    mql.addEventListener("change", update)
+    return () => mql.removeEventListener("change", update)
+  }, [])
 
   useEffect(() => {
     const target = ctaRef.current
@@ -49,6 +93,9 @@ export function StickyCartBar({
     await addItem(selectedVariantId, 1)
   }
 
+  // Hide on mobile while cookie banner is up so it doesn't cover the Add-to-Cart action.
+  if (mounted && consentPending && isMobile) return null
+
   return (
     <div
       className={cn(
@@ -56,7 +103,7 @@ export function StickyCartBar({
         isVisible ? "translate-y-0" : "translate-y-full"
       )}
     >
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 pt-3 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
         {/* Left side: thumbnail + product info (hidden on mobile) */}
         <div className="hidden items-center gap-3 sm:flex">
           {thumbnail && (
@@ -93,7 +140,7 @@ export function StickyCartBar({
             onClick={handleAdd}
             disabled={!selectedVariantId || isUpdating}
             className={cn(
-              "px-6 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-white transition-opacity",
+              "px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-opacity",
               "bg-teal-400",
               (!selectedVariantId || isUpdating) &&
                 "cursor-not-allowed opacity-50"

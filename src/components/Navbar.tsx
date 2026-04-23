@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { ShoppingCart, Menu, X, User, Search } from "lucide-react"
+import { ShoppingCart, Menu, X, User } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/lib/context/cart-context"
@@ -26,6 +26,9 @@ export function Navbar({ transparent = false }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { cartCount, openCart } = useCart()
   const { isAuthenticated, customer } = useAuth()
+  const firstLinkRef = useRef<HTMLAnchorElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const hasMountedRef = useRef(false)
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -33,6 +36,15 @@ export function Navbar({ transparent = false }: NavbarProps) {
       document.body.style.overflow = "hidden"
     } else {
       document.body.style.overflow = ""
+    }
+    if (hasMountedRef.current) {
+      if (menuOpen) {
+        firstLinkRef.current?.focus()
+      } else {
+        triggerRef.current?.focus()
+      }
+    } else {
+      hasMountedRef.current = true
     }
     return () => {
       document.body.style.overflow = ""
@@ -107,7 +119,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
             <button
               onClick={openCart}
               className={cn(
-                "relative z-50 inline-flex p-2 transition-colors",
+                "relative z-50 inline-flex p-2.5 transition-colors",
                 menuOpen
                   ? "text-white/60 hover:text-white"
                   : solid
@@ -152,9 +164,10 @@ export function Navbar({ transparent = false }: NavbarProps) {
 
             {/* Mobile menu toggle */}
             <button
+              ref={triggerRef}
               onClick={() => setMenuOpen(!menuOpen)}
               className={cn(
-                "relative z-50 inline-flex p-2 transition-colors md:hidden",
+                "relative z-50 inline-flex p-2.5 transition-colors md:hidden",
                 menuOpen
                   ? "text-white/60 hover:text-white"
                   : solid
@@ -204,6 +217,23 @@ export function Navbar({ transparent = false }: NavbarProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
+            onKeyDown={(e) => {
+              if (e.key !== "Tab") return
+              const dialog = e.currentTarget
+              const focusables = dialog.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled])'
+              )
+              if (focusables.length === 0) return
+              const first = focusables[0]
+              const last = focusables[focusables.length - 1]
+              if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault()
+                last.focus()
+              } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault()
+                first.focus()
+              }
+            }}
           >
             {/* Nav links — staggered entrance */}
             <nav className="flex flex-1 flex-col justify-center px-8">
@@ -220,6 +250,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
                   }}
                 >
                   <Link
+                    ref={i === 0 ? firstLinkRef : undefined}
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     className={cn(
@@ -253,14 +284,6 @@ export function Navbar({ transparent = false }: NavbarProps) {
                   {isAuthenticated
                     ? customer?.first_name ?? "Account"
                     : "Inloggen"}
-                </Link>
-                <Link
-                  href="/search"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2 text-sm font-medium text-white/50 transition-colors hover:text-white"
-                >
-                  <Search className="size-4" />
-                  Zoeken
                 </Link>
               </div>
             </motion.div>

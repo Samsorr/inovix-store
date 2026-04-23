@@ -80,7 +80,7 @@ export default function LoginPage() {
       </p>
 
       {error && (
-        <div className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
+        <div role="alert" className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -93,6 +93,9 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoFocus
+          autoComplete="email"
+          inputMode="email"
+          name="email"
         />
         <Input
           type="password"
@@ -100,6 +103,8 @@ export default function LoginPage() {
           placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+          name="password"
         />
 
         <div className="pt-2">

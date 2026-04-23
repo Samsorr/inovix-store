@@ -43,8 +43,10 @@ export function ProductImageGallery({
             <button
               key={image.id}
               onClick={() => setSelectedIndex(index)}
+              aria-label={`Afbeelding ${index + 1} van ${displayImages.length}`}
+              aria-pressed={index === selectedIndex}
               className={cn(
-                "relative h-16 w-16 shrink-0 cursor-pointer overflow-hidden bg-surface-tertiary",
+                "relative h-16 w-16 shrink-0 cursor-pointer overflow-hidden bg-surface-tertiary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400",
                 index === selectedIndex
                   ? "border-2 border-navy-500"
                   : "border border-border"

@@ -110,7 +110,7 @@ export default function WachtwoordHerstellenPage() {
       </p>
 
       {error && (
-        <div className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
+        <div role="alert" className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -123,6 +123,8 @@ export default function WachtwoordHerstellenPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoFocus
+          autoComplete="new-password"
+          name="new-password"
         />
         <Input
           type="password"
@@ -130,6 +132,8 @@ export default function WachtwoordHerstellenPage() {
           placeholder="Herhaal uw wachtwoord"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          autoComplete="new-password"
+          name="new-password"
         />
         <div className="pt-2">
           <Button

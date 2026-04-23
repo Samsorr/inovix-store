@@ -115,7 +115,7 @@ export default function RegistratiePage() {
       </p>
 
       {error && (
-        <div className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
+        <div role="alert" className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -128,12 +128,16 @@ export default function RegistratiePage() {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             autoFocus
+            autoComplete="given-name"
+            name="given-name"
           />
           <Input
             label="Achternaam"
             placeholder="de Vries"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            autoComplete="family-name"
+            name="family-name"
           />
         </div>
         <Input
@@ -142,6 +146,9 @@ export default function RegistratiePage() {
           placeholder="uw@email.nl"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          inputMode="email"
+          name="email"
         />
         <Input
           type="password"
@@ -149,6 +156,8 @@ export default function RegistratiePage() {
           placeholder="Minimaal 8 tekens"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
+          name="new-password"
         />
 
         {/* Research disclaimer */}
@@ -166,7 +175,7 @@ export default function RegistratiePage() {
               </p>
             </div>
           </div>
-          <label className="mt-3 flex cursor-pointer items-center gap-3">
+          <label className="mt-3 flex cursor-pointer items-center gap-3 focus-within:ring-2 focus-within:ring-teal-400/40 focus-within:ring-offset-2">
             <div
               className={cn(
                 "flex size-4 shrink-0 items-center justify-center border transition-colors",
