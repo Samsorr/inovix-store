@@ -1,28 +1,37 @@
-import DOMPurify from "isomorphic-dompurify"
+import sanitizeHtml from "sanitize-html"
 
-const ALLOWED_TAGS = [
-  "p",
-  "br",
-  "strong",
-  "em",
-  "b",
-  "i",
-  "u",
-  "s",
-  "h2",
-  "h3",
-  "ul",
-  "ol",
-  "li",
-  "a",
-  "blockquote",
-  "code",
-  "pre",
-  "img",
-  "hr",
-]
-
-const ALLOWED_ATTR = ["href", "target", "rel", "src", "alt", "title"]
+const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [
+    "p",
+    "br",
+    "strong",
+    "em",
+    "b",
+    "i",
+    "u",
+    "s",
+    "h2",
+    "h3",
+    "ul",
+    "ol",
+    "li",
+    "a",
+    "blockquote",
+    "code",
+    "pre",
+    "img",
+    "hr",
+  ],
+  allowedAttributes: {
+    a: ["href", "target", "rel", "title"],
+    img: ["src", "alt", "title"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+  allowedSchemesByTag: { img: ["http", "https", "data"] },
+  transformTags: {
+    a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }, true),
+  },
+}
 
 type Props = {
   html: string
@@ -30,11 +39,7 @@ type Props = {
 }
 
 export function RichDescription({ html, className }: Props) {
-  const clean = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|\/)/i,
-  })
+  const clean = sanitizeHtml(html, SANITIZE_OPTIONS)
 
   return (
     <div
