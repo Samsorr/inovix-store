@@ -95,13 +95,13 @@ export default async function ProductDetailPage({ params }: Props) {
         aria-label="Breadcrumb"
         className="mb-4 text-[11px] uppercase tracking-wide text-navy-500/45"
       >
-        <Link href="/" className="transition-colors hover:text-navy-500">
+        <Link href="/" className="inline-flex items-center py-1.5 -my-1.5 transition-colors hover:text-navy-500">
           Home
         </Link>
         <span className="mx-2">/</span>
         <Link
           href="/products"
-          className="transition-colors hover:text-navy-500"
+          className="inline-flex items-center py-1.5 -my-1.5 transition-colors hover:text-navy-500"
         >
           Peptiden
         </Link>

@@ -74,7 +74,7 @@ export default function WachtwoordVergetenPage() {
       </p>
 
       {error && (
-        <div className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
+        <div role="alert" className="mt-6 border-l-2 border-red-500 bg-white py-2 pl-4 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -87,6 +87,9 @@ export default function WachtwoordVergetenPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoFocus
+          autoComplete="email"
+          inputMode="email"
+          name="email"
         />
         <div className="pt-2">
           <Button

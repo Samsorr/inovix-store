@@ -414,7 +414,7 @@ function ConsentToggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400",
+        "relative inline-flex h-9 w-16 shrink-0 cursor-pointer items-center border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400",
         checked
           ? "border-mauve-500 bg-mauve-500"
           : "border-border bg-surface-secondary",
@@ -424,8 +424,8 @@ function ConsentToggle({
       <span
         aria-hidden="true"
         className={cn(
-          "inline-block size-5 transform bg-white shadow-sm transition-transform",
-          checked ? "translate-x-6" : "translate-x-0.5"
+          "inline-block size-7 transform bg-white shadow-sm transition-transform",
+          checked ? "translate-x-8" : "translate-x-0.5"
         )}
       />
     </button>

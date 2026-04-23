@@ -109,7 +109,7 @@ export function CartSheet() {
                         type="button"
                         disabled={isUpdating}
                         onClick={() => handleDecrease(item.id, item.quantity)}
-                        className="flex size-8 items-center justify-center border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
+                        className="flex size-11 items-center justify-center border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
                         aria-label="Verminder hoeveelheid"
                       >
                         <Minus className="size-3.5" />
@@ -121,7 +121,7 @@ export function CartSheet() {
                         type="button"
                         disabled={isUpdating}
                         onClick={() => handleIncrease(item.id, item.quantity)}
-                        className="flex size-8 items-center justify-center border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
+                        className="flex size-11 items-center justify-center border border-border text-navy-500 transition-colors hover:bg-surface-secondary disabled:opacity-50"
                         aria-label="Verhoog hoeveelheid"
                       >
                         <Plus className="size-3.5" />
@@ -133,7 +133,7 @@ export function CartSheet() {
                       type="button"
                       disabled={isUpdating}
                       onClick={() => removeItem(item.id)}
-                      className="text-xs text-navy-500 underline underline-offset-4 decoration-border transition-colors hover:text-red-600 hover:decoration-red-600 disabled:opacity-50"
+                      className="text-xs text-navy-500 underline underline-offset-4 decoration-border transition-colors hover:text-red-600 hover:decoration-red-600 disabled:opacity-50 min-h-[44px] inline-flex items-center"
                     >
                       Verwijder
                     </button>

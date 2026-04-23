@@ -4,13 +4,6 @@ import Image from "next/image"
 const productLinks = [
   { label: "Peptiden", href: "/products" },
   { label: "GLP-1", href: "/products?category=glp-1" },
-  { label: "Lab Supplies", href: "/lab-supplies" },
-]
-
-const researchLinks = [
-  { label: "Kennisbank", href: "/kennisbank" },
-  { label: "Protocollen", href: "/protocollen" },
-  { label: "Certificaten (CoA)", href: "/coa" },
 ]
 
 const legalLinks = [
@@ -37,7 +30,7 @@ function FooterLinkGroup({
           <li key={link.href}>
             <Link
               href={link.href}
-              className="text-sm text-white/60 transition-colors hover:text-white"
+              className="inline-flex items-center py-1.5 text-sm text-white/60 transition-colors hover:text-white"
             >
               {link.label}
             </Link>
@@ -52,7 +45,7 @@ export function Footer() {
   return (
     <footer className="bg-navy-500 text-white">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-        <div className="grid gap-8 grid-cols-2 sm:gap-10 lg:grid-cols-4">
+        <div className="grid gap-8 grid-cols-2 sm:gap-10 lg:grid-cols-3">
           {/* Brand */}
           <div className="col-span-2 lg:col-span-1">
             <Link href="/" aria-label="Inovix home" className="inline-flex items-center">
@@ -76,7 +69,6 @@ export function Footer() {
           </div>
 
           <FooterLinkGroup title="Producten" links={productLinks} />
-          <FooterLinkGroup title="Onderzoek" links={researchLinks} />
           <FooterLinkGroup title="Juridisch" links={legalLinks} />
         </div>
 

@@ -45,16 +45,15 @@ function ProductCardInner({
   image,
   productId,
   variants = [],
+  href,
   className,
-}: Omit<ProductCardProps, "href" | "category">) {
+}: Omit<ProductCardProps, "category">) {
   const router = useRouter()
   const { addItem, isUpdating } = useCart()
   const hasMultipleVariants = variants.length > 1
   const firstVariantId = variants[0]?.id
 
-  async function handleAddToCart(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
+  async function handleAddToCart() {
     if (hasMultipleVariants) {
       router.push(`/products/${productId}`)
       return
@@ -74,7 +73,7 @@ function ProductCardInner({
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "group relative flex flex-col overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
         className
       )}
     >
@@ -108,9 +107,20 @@ function ProductCardInner({
       {/* Content */}
       <div className="flex flex-1 flex-col px-4 pt-3 sm:px-5 sm:pt-4">
         <div className="flex items-baseline justify-between gap-2">
-          <h3 className="text-base font-semibold tracking-tight text-navy-500 sm:text-lg">
-            {name}
-          </h3>
+          {href ? (
+            <Link
+              href={href}
+              className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 before:absolute before:inset-0 before:z-0"
+            >
+              <h3 className="text-base font-semibold tracking-tight text-navy-500 sm:text-lg">
+                {name}
+              </h3>
+            </Link>
+          ) : (
+            <h3 className="text-base font-semibold tracking-tight text-navy-500 sm:text-lg">
+              {name}
+            </h3>
+          )}
           <span className="shrink-0 font-mono text-[10px] tracking-wide text-muted-foreground">
             {refCode}
           </span>
@@ -135,7 +145,7 @@ function ProductCardInner({
       </div>
 
       {/* Footer: price + add to cart */}
-      <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
+      <div className="relative z-10 mt-auto flex flex-col gap-3 px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
         <span className="text-xl font-bold tracking-tight text-navy-500">
           {currency}{formattedPrice}
         </span>
@@ -161,14 +171,7 @@ function ProductCardInner({
   )
 }
 
-export function ProductCard({ href, category: _, ...props }: ProductCardProps) {
-  if (href) {
-    return (
-      <Link href={href} className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400">
-        <ProductCardInner {...props} />
-      </Link>
-    )
-  }
+export function ProductCard({ category: _, ...props }: ProductCardProps) {
   return <ProductCardInner {...props} />
 }
 

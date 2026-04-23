@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600", "700"],
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://inovix.eu"
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://inovix-peptides.com"
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -58,6 +58,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: "#162043",
+  colorScheme: "light",
 }
 
 export default function RootLayout({

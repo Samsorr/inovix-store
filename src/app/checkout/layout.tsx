@@ -4,7 +4,7 @@ import Image from "next/image"
 import { ArrowLeft } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Checkout | Inovix",
+  title: "Checkout",
   description: "Rond uw bestelling veilig af.",
 }
 
