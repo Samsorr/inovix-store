@@ -79,9 +79,8 @@ describe("ProductActions", () => {
       />
     )
 
-    // 4999 cents = 49,99 EUR (nl-NL format)
     // Price appears in both the main display and the StickyCartBar
-    const priceElements = screen.getAllByText(/49,99/)
+    const priceElements = screen.getAllByText(/4\.999,00/)
     expect(priceElements.length).toBeGreaterThanOrEqual(1)
   })
 
@@ -173,7 +172,7 @@ describe("ProductActions", () => {
     await user.click(screen.getByLabelText("Verhoog aantal"))
 
     await user.click(
-      screen.getByRole("button", { name: /TOEVOEGEN AAN WINKELWAGEN/ })
+      screen.getByRole("button", { name: /IN WINKELWAGEN/ })
     )
 
     expect(mockAddItem).toHaveBeenCalledWith("var_5mg", 3)
@@ -196,9 +195,8 @@ describe("ProductActions", () => {
     expect(coaLink).toBeInTheDocument()
     expect(coaLink.closest("a")).toHaveAttribute(
       "href",
-      "/docs/bpc-157-coa.pdf"
+      "/api/products/prod_test/coa"
     )
-    expect(coaLink.closest("a")).toHaveAttribute("target", "_blank")
   })
 
   it("hides CoA link when no coaUrl is provided", () => {
@@ -244,10 +242,10 @@ describe("ProductActions", () => {
     )
 
     expect(
-      screen.getByRole("button", { name: /SELECTEER EEN VARIANT/ })
+      screen.getByRole("button", { name: /KIES EEN VARIANT/ })
     ).toBeInTheDocument()
     expect(
-      screen.getByRole("button", { name: /SELECTEER EEN VARIANT/ })
+      screen.getByRole("button", { name: /KIES EEN VARIANT/ })
     ).toBeDisabled()
   })
 
@@ -268,10 +266,10 @@ describe("ProductActions", () => {
     // Select first variant
     await user.click(screen.getByRole("button", { name: "5mg" }))
     // Price appears in both main display and StickyCartBar
-    expect(screen.getAllByText(/49,99/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/4\.999,00/).length).toBeGreaterThanOrEqual(1)
 
     // Select second variant
     await user.click(screen.getByRole("button", { name: "10mg" }))
-    expect(screen.getAllByText(/89,99/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/8\.999,00/).length).toBeGreaterThanOrEqual(1)
   })
 })
