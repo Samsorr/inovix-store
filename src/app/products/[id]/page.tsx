@@ -12,6 +12,7 @@ import { ProductTabs } from "@/components/product/ProductTabs"
 import { SpecsTable } from "@/components/product/SpecsTable"
 import { StorageCards } from "@/components/product/StorageCards"
 import { RelatedProducts } from "@/components/product/RelatedProducts"
+import { RichDescription } from "@/components/product/RichDescription"
 
 export const revalidate = 60
 
@@ -78,6 +79,7 @@ export default async function ProductDetailPage({ params }: Props) {
   const storageTemp = metadata.storage_temp as string | undefined
   const handlingNotes = metadata.handling_notes as string | undefined
   const coaUrl = metadata.coa_url as string | undefined
+  const longDescription = metadata.long_description as string | undefined
   const category = metadata.category as string | undefined
   const badges = Array.isArray(metadata.badges)
     ? (metadata.badges as TrustBadgeKey[])
@@ -186,7 +188,9 @@ export default async function ProductDetailPage({ params }: Props) {
           {
             id: "description",
             label: "Beschrijving",
-            content: product.description ? (
+            content: longDescription ? (
+              <RichDescription html={longDescription} />
+            ) : product.description ? (
               <div className="max-w-prose text-sm leading-relaxed text-navy-500">
                 {product.description}
               </div>
