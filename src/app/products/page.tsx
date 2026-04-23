@@ -78,7 +78,7 @@ export default async function ProductsPage() {
         <Link href="/" className="inline-flex items-center py-1.5 -my-1.5 transition-colors hover:text-navy-500">
           Home
         </Link>
-        <span className="mx-2">&mdash;</span>
+        <span className="mx-2">/</span>
         <span className="font-medium text-mauve-500">Peptiden</span>
       </nav>
 
