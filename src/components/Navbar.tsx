@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { ShoppingCart, Menu, X, User, Search } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
@@ -63,12 +64,20 @@ export function Navbar({ transparent = false }: NavbarProps) {
           {/* Logo */}
           <Link
             href="/"
-            className={cn(
-              "relative z-50 text-base font-bold tracking-wide",
-              menuOpen ? "text-white" : solid ? "text-navy-500" : "text-white"
-            )}
+            aria-label="Inovix home"
+            className="relative z-50 flex items-center"
           >
-            INOVIX
+            <Image
+              src="/images/inovix-logo.png"
+              alt="Inovix"
+              width={166}
+              height={28}
+              priority
+              className={cn(
+                "h-7 w-auto",
+                (menuOpen || !solid) && "brightness-0 invert"
+              )}
+            />
           </Link>
 
           {/* Desktop nav links */}

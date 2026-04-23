@@ -196,7 +196,7 @@ describe("Navbar", () => {
   it("logo links to home page", () => {
     render(<Navbar />)
 
-    const logo = screen.getByText("INOVIX")
-    expect(logo.closest("a")).toHaveAttribute("href", "/")
+    const logo = screen.getByRole("link", { name: /inovix home/i })
+    expect(logo).toHaveAttribute("href", "/")
   })
 })
