@@ -29,7 +29,7 @@ export function ProductTabs({ tabs, className }: ProductTabsProps) {
     <div className={cn(className)}>
       <div className="border-t border-border">
         <div
-          className="-mx-4 flex overflow-x-auto px-4 sm:mx-0 sm:px-0"
+          className="flex flex-wrap"
           role="tablist"
         >
           {visibleTabs.map((tab) => (

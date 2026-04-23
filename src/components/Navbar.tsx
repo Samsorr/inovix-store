@@ -70,11 +70,11 @@ export function Navbar({ transparent = false }: NavbarProps) {
             <Image
               src="/images/inovix-logo.png"
               alt="Inovix"
-              width={166}
-              height={28}
+              width={142}
+              height={24}
               priority
               className={cn(
-                "h-7 w-auto",
+                "h-5 w-auto sm:h-6",
                 (menuOpen || !solid) && "brightness-0 invert"
               )}
             />
