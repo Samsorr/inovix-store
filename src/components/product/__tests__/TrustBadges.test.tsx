@@ -11,53 +11,62 @@ describe("TrustBadges", () => {
   })
 
   it("hides purity badge when purity is 0", () => {
-    render(<TrustBadges purity={0} />)
+    const { container } = render(<TrustBadges purity={0} />)
 
     expect(screen.queryByText(/ZUIVERHEID/)).not.toBeInTheDocument()
+    expect(container.firstChild).toBeNull()
   })
 
-  it("hides purity badge when purity is undefined", () => {
-    render(<TrustBadges />)
+  it("renders nothing when no purity and no badges provided", () => {
+    const { container } = render(<TrustBadges />)
 
-    expect(screen.queryByText(/ZUIVERHEID/)).not.toBeInTheDocument()
+    expect(container.firstChild).toBeNull()
   })
 
-  it("always shows HPLC tested badge", () => {
-    render(<TrustBadges />)
+  it("renders only requested badges from the badges prop", () => {
+    render(<TrustBadges badges={["hplc_tested"]} />)
 
     expect(screen.getByText("HPLC GETEST")).toBeInTheDocument()
+    expect(screen.queryByText("3RD-PARTY VERIFIED")).not.toBeInTheDocument()
+    expect(screen.queryByText("EU VERZENDING")).not.toBeInTheDocument()
   })
 
-  it("always shows 3rd-party verified badge", () => {
-    render(<TrustBadges />)
+  it("renders all configured badges when all keys are passed", () => {
+    render(
+      <TrustBadges
+        badges={["hplc_tested", "third_party_verified", "eu_shipping"]}
+      />
+    )
 
+    expect(screen.getByText("HPLC GETEST")).toBeInTheDocument()
     expect(screen.getByText("3RD-PARTY VERIFIED")).toBeInTheDocument()
-  })
-
-  it("always shows EU shipping badge", () => {
-    render(<TrustBadges />)
-
     expect(screen.getByText("EU VERZENDING")).toBeInTheDocument()
   })
 
-  it("shows all four badges when purity is provided", () => {
-    const { container } = render(<TrustBadges purity={99} />)
+  it("ignores unknown badge keys", () => {
+    const { container } = render(
+      // @ts-expect-error intentional invalid key for robustness test
+      <TrustBadges badges={["nonexistent"]} />
+    )
 
-    // 4 badge spans total
+    expect(container.firstChild).toBeNull()
+  })
+
+  it("shows purity together with selected badges", () => {
+    const { container } = render(
+      <TrustBadges
+        purity={99}
+        badges={["hplc_tested", "third_party_verified", "eu_shipping"]}
+      />
+    )
+
     const badges = container.querySelectorAll("span.flex.items-center")
     expect(badges.length).toBe(4)
   })
 
-  it("shows three badges when purity is not provided", () => {
-    const { container } = render(<TrustBadges />)
-
-    const badges = container.querySelectorAll("span.flex.items-center")
-    expect(badges.length).toBe(3)
-  })
-
   it("applies custom className", () => {
     const { container } = render(
-      <TrustBadges className="mt-4" />
+      <TrustBadges purity={99} className="mt-4" />
     )
 
     expect(container.firstElementChild).toHaveClass("mt-4")

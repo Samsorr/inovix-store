@@ -102,7 +102,11 @@ export default async function ProductsPage() {
           zijn HPLC-getest met &ge;99% zuiverheid en worden geleverd vanuit de
           EU.
         </p>
-        <TrustBadges purity={99} className="mt-4" />
+        <TrustBadges
+          purity={99}
+          badges={["hplc_tested", "third_party_verified", "eu_shipping"]}
+          className="mt-4"
+        />
       </div>
 
       {/* Divider */}

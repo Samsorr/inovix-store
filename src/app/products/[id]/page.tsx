@@ -6,7 +6,7 @@ import medusa from "@/lib/medusa"
 import { getDefaultRegionId } from "@/lib/region"
 import { ResearchDisclaimer } from "@/components/ResearchDisclaimer"
 import { ProductImageGallery } from "@/components/product/ProductImageGallery"
-import { TrustBadges } from "@/components/product/TrustBadges"
+import { TrustBadges, type TrustBadgeKey } from "@/components/product/TrustBadges"
 import { ProductActions } from "@/components/product/ProductActions"
 import { ProductTabs } from "@/components/product/ProductTabs"
 import { SpecsTable } from "@/components/product/SpecsTable"
@@ -79,6 +79,9 @@ export default async function ProductDetailPage({ params }: Props) {
   const handlingNotes = metadata.handling_notes as string | undefined
   const coaUrl = metadata.coa_url as string | undefined
   const category = metadata.category as string | undefined
+  const badges = Array.isArray(metadata.badges)
+    ? (metadata.badges as TrustBadgeKey[])
+    : []
 
   // Check if storage tab has data
   const hasStorage = storageTemp || shelfLife || solubility || handlingNotes
@@ -142,7 +145,7 @@ export default async function ProductDetailPage({ params }: Props) {
           )}
 
           {/* Trust badges */}
-          <TrustBadges purity={purity} className="mt-4" />
+          <TrustBadges purity={purity} badges={badges} className="mt-4" />
 
           {/* Divider */}
           <div className="mt-5 border-t border-border" />
