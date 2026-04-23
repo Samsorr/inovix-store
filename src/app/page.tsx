@@ -4,7 +4,7 @@ import {
   Shield,
   FlaskConical,
   CheckCircle,
-  Snowflake,
+  Truck,
   ArrowRight,
   Flame,
   HeartPulse,
@@ -198,9 +198,9 @@ export default async function HomePage() {
           </div>
           <div className="md:px-8">
             <TrustItem
-              icon={Snowflake}
-              title="Cold-chain verzending"
-              description="Behoud van integriteit tijdens transport"
+              icon={Truck}
+              title="Snelle EU-verzending"
+              description="Zorgvuldig verpakt en snel geleverd binnen de EU"
             />
           </div>
         </div>

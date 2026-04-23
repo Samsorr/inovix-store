@@ -70,10 +70,10 @@ const steps: Step[] = [
   },
   {
     number: "06",
-    title: "CoA & Cold-Chain Verzending",
-    tags: ["2-8°C"],
+    title: "CoA & Snelle EU-Verzending",
+    tags: ["EU"],
     description:
-      "Na vrijgave wordt het Certificaat van Analyse gegenereerd en het product verpakt met koelelementen. Temperatuur-gecontroleerde verzending binnen de EU garandeert integriteit tot aan uw laboratorium.",
+      "Na vrijgave wordt het Certificaat van Analyse gegenereerd en het product zorgvuldig verpakt. Snelle verzending binnen de Europese Unie met tracking tot aan uw laboratorium.",
   },
 ]
 

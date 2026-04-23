@@ -3,7 +3,7 @@ import {
   Shield,
   FlaskConical,
   CheckCircle,
-  Snowflake,
+  Truck,
   ArrowRight,
   ShoppingCart,
 } from "lucide-react"
@@ -481,9 +481,9 @@ export default function DesignSystemPage() {
               description="Volledig in overeenstemming met EU-wetgeving"
             />
             <TrustBadge
-              icon={Snowflake}
-              title="Cold-chain verzending"
-              description="Behoud van integriteit tijdens transport"
+              icon={Truck}
+              title="Snelle EU-verzending"
+              description="Zorgvuldig verpakt en snel geleverd binnen de EU"
             />
           </div>
         </Section>

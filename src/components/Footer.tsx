@@ -62,7 +62,7 @@ export function Footer() {
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/60">
               Premium peptiden voor wetenschappelijk laboratoriumonderzoek.
-              Geleverd binnen de EU met cold-chain garantie.
+              Snel geleverd binnen de EU.
             </p>
             <p className="mt-4 text-xs leading-relaxed text-white/40">
               Alle producten zijn uitsluitend bestemd voor in-vitro

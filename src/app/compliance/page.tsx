@@ -92,13 +92,12 @@ export default function CompliancePage() {
 
         <section>
           <h2 className="text-xl font-bold text-navy-500 sm:text-2xl">
-            Cold-chain verzending
+            Snelle EU-verzending
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Gelyofiliseerde peptiden worden verzonden in geïsoleerde
-            verpakkingen met gelpacks of droogijs, afhankelijk van het
-            temperatuurprofiel van de verbinding. Elke zending bevat een
-            indicator om de koelketen te valideren.
+            Gelyofiliseerde peptiden worden zorgvuldig verpakt in
+            beschermende verpakkingen en snel verzonden binnen de
+            Europese Unie. Elke zending wordt getrackt tot aflevering.
           </p>
         </section>
 

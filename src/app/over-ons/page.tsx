@@ -5,7 +5,7 @@ import {
   Shield,
   FlaskConical,
   FileCheck,
-  Snowflake,
+  Truck,
   ArrowRight,
 } from "lucide-react"
 
@@ -114,9 +114,9 @@ export default function OverOnsPage() {
                   </p>
                   <p>
                     Het resultaat: verbindingen die u met vertrouwen kunt
-                    inzetten in uw onderzoek, geleverd via een gekoelde keten
-                    die de integriteit van synthese tot aan uw laboratoriumbank
-                    waarborgt.
+                    inzetten in uw onderzoek, zorgvuldig verpakt en snel
+                    verzonden binnen de EU, van synthese tot aan uw
+                    laboratoriumbank.
                   </p>
                 </div>
               </div>
@@ -188,9 +188,9 @@ export default function OverOnsPage() {
                 </ScrollReveal>
                 <ScrollReveal delay={0.2}>
                   <QualityCard
-                    icon={Snowflake}
-                    title="Cold-chain logistiek"
-                    description="Temperatuurgecontroleerde opslag en verzending waarborgen de integriteit."
+                    icon={Truck}
+                    title="Snelle EU-verzending"
+                    description="Zorgvuldig verpakt en snel geleverd binnen de EU, met tracking tot aflevering."
                   />
                 </ScrollReveal>
               </div>
@@ -235,7 +235,7 @@ export default function OverOnsPage() {
                   step: "04",
                   title: "Verzending",
                   description:
-                    "Gelyofiliseerd product, vacuüm verpakt en verzonden via temperatuurgecontroleerd transport binnen de EU.",
+                    "Gelyofiliseerd product, vacuüm verpakt en snel verzonden binnen de EU met tracking tot aflevering.",
                 },
               ]}
             />

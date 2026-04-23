@@ -73,10 +73,10 @@ export default function VoorwaardenPage() {
             Levering
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Bestellingen worden verzonden via een temperatuurgecontroleerde
-            koelketen. Levering vindt plaats binnen de Europese Unie. De
-            opgegeven levertermijnen zijn indicatief; overschrijding geeft
-            geen recht op schadevergoeding of ontbinding.
+            Bestellingen worden zorgvuldig verpakt en snel verzonden binnen
+            de Europese Unie. De opgegeven levertermijnen zijn indicatief;
+            overschrijding geeft geen recht op schadevergoeding of
+            ontbinding.
           </p>
         </section>
 
