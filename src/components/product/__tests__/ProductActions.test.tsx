@@ -73,6 +73,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={singleVariant}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -88,6 +89,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={multipleVariants}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -102,6 +104,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={singleVariant}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -118,6 +121,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={singleVariant}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -140,6 +144,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={singleVariant}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -157,6 +162,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={singleVariant}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -178,6 +184,7 @@ describe("ProductActions", () => {
       <ProductActions
         variants={singleVariant}
         coaUrl="/docs/bpc-157-coa.pdf"
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -198,6 +205,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={singleVariant}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -212,6 +220,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={singleVariant}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -228,6 +237,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={multipleVariants}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />
@@ -246,6 +256,7 @@ describe("ProductActions", () => {
     render(
       <ProductActions
         variants={multipleVariants}
+        productId="prod_test"
         productTitle="BPC-157"
         thumbnail={null}
       />

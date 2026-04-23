@@ -52,15 +52,13 @@ export async function RelatedProducts({
               className="group border border-border overflow-hidden transition-colors hover:border-navy-200"
             >
               <div className="relative h-32 bg-surface-tertiary">
-                {product.thumbnail ? (
-                  <Image
-                    src={product.thumbnail}
-                    alt={product.title ?? ""}
-                    fill
-                    className="object-contain"
-                    sizes="(min-width: 768px) 25vw, 50vw"
-                  />
-                ) : null}
+                <Image
+                  src={product.thumbnail || "/images/product-peptide.png"}
+                  alt={product.title ?? ""}
+                  fill
+                  className="object-contain"
+                  sizes="(min-width: 768px) 25vw, 50vw"
+                />
               </div>
 
               <div className="p-3">

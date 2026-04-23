@@ -28,7 +28,10 @@ export function ProductTabs({ tabs, className }: ProductTabsProps) {
   return (
     <div className={cn(className)}>
       <div className="border-t border-border">
-        <div className="flex" role="tablist">
+        <div
+          className="-mx-4 flex overflow-x-auto px-4 sm:mx-0 sm:px-0"
+          role="tablist"
+        >
           {visibleTabs.map((tab) => (
             <button
               key={tab.id}
@@ -38,7 +41,7 @@ export function ProductTabs({ tabs, className }: ProductTabsProps) {
               aria-controls={`panel-${tab.id}`}
               onClick={() => setActiveTabId(tab.id)}
               className={cn(
-                "px-5 py-3.5 text-[11px] font-semibold uppercase tracking-widest transition-colors",
+                "shrink-0 whitespace-nowrap px-4 py-3.5 text-[11px] font-semibold uppercase tracking-widest transition-colors sm:px-5",
                 tab.id === activeTab.id
                   ? "text-navy-500 border-b-2 border-mauve-500 -mb-px"
                   : "text-muted-foreground hover:text-navy-300"

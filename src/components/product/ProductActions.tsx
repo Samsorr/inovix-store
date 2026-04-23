@@ -20,6 +20,7 @@ type Variant = {
 interface ProductActionsProps {
   variants: Variant[]
   coaUrl?: string | null
+  productId: string
   productTitle: string
   thumbnail: string | null
 }
@@ -27,6 +28,7 @@ interface ProductActionsProps {
 export function ProductActions({
   variants,
   coaUrl,
+  productId,
   productTitle,
   thumbnail,
 }: ProductActionsProps) {
@@ -87,22 +89,25 @@ export function ProductActions({
         )}
 
         {/* Quantity + Add to Cart */}
-        <div ref={ctaRef} className="flex gap-3">
+        <div
+          ref={ctaRef}
+          className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
+        >
           {/* Quantity selector */}
-          <div className="flex items-center border border-border">
+          <div className="flex items-center self-start border border-border sm:self-auto">
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="px-3 py-2.5 text-muted-foreground transition-colors hover:text-navy-500"
+              className="px-3 py-3 text-muted-foreground transition-colors hover:text-navy-500"
               aria-label="Verminder aantal"
             >
               <Minus className="size-3.5" />
             </button>
-            <span className="min-w-[2rem] text-center text-sm font-semibold text-navy-500">
+            <span className="min-w-[2.5rem] text-center text-sm font-semibold text-navy-500">
               {quantity}
             </span>
             <button
               onClick={() => setQuantity((q) => q + 1)}
-              className="px-3 py-2.5 text-muted-foreground transition-colors hover:text-navy-500"
+              className="px-3 py-3 text-muted-foreground transition-colors hover:text-navy-500"
               aria-label="Verhoog aantal"
             >
               <Plus className="size-3.5" />
@@ -113,23 +118,23 @@ export function ProductActions({
           <button
             disabled={!selectedVariantId || isUpdating}
             onClick={handleAddToCart}
-            className="flex flex-1 items-center justify-center gap-2 bg-teal-400 px-6 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-white transition-colors hover:bg-teal-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 bg-teal-400 px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-white transition-colors hover:bg-teal-300 disabled:cursor-not-allowed disabled:opacity-50 sm:px-6"
           >
-            <ShoppingCart className="size-4" />
-            {isUpdating
-              ? "TOEVOEGEN..."
-              : !selectedVariantId
-                ? "SELECTEER EEN VARIANT"
-                : "TOEVOEGEN AAN WINKELWAGEN"}
+            <ShoppingCart className="size-4 shrink-0" />
+            <span className="truncate">
+              {isUpdating
+                ? "TOEVOEGEN..."
+                : !selectedVariantId
+                  ? "KIES EEN VARIANT"
+                  : "IN WINKELWAGEN"}
+            </span>
           </button>
         </div>
 
         {/* CoA Download */}
         {coaUrl && (
           <a
-            href={coaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/api/products/${productId}/coa`}
             className="inline-flex items-center gap-1.5 text-[11px] font-medium text-mauve-500 transition-colors hover:text-mauve-400"
           >
             <Download className="size-3.5" />
